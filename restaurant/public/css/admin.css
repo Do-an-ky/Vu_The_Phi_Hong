@@ -1,0 +1,926 @@
+/* Giao diện quản trị dùng riêng, không ghi đè CSS của nhân viên. */
+:root {
+    --green: #14634d;
+    --dark: #103b30;
+    --ink: #203830;
+    --muted: #697971;
+    --line: #dce5df;
+    --bg: #f3f6f4;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: "Segoe UI", Arial, sans-serif;
+    font-size: 16px;
+    line-height: 1.5;
+}
+
+a {
+    color: inherit;
+    text-decoration: none;
+}
+
+button, input, select {
+    font: inherit;
+}
+
+button, a, input, select {
+    -webkit-tap-highlight-color: transparent;
+}
+
+:focus-visible {
+    outline: 3px solid #d29a25;
+    outline-offset: 3px;
+}
+
+h1, h2, p {
+    margin-top: 0;
+}
+
+h1 {
+    margin-bottom: 0;
+    font-size: clamp(28px, 2.6vw, 38px);
+    line-height: 1.25;
+    letter-spacing: -0.8px;
+}
+
+h2 {
+    margin-bottom: 0;
+    font-size: 21px;
+    line-height: 1.4;
+}
+
+.admin-sidebar {
+    position: fixed;
+    inset: 0 auto 0 0;
+    display: flex;
+    flex-direction: column;
+    width: 256px;
+    padding: 32px 18px 24px;
+    overflow-y: auto;
+    background: var(--dark);
+    color: #fff;
+}
+
+.brand, .login-brand {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    font-size: 25px;
+    font-weight: 750;
+    letter-spacing: 2px;
+}
+
+.brand-mark {
+    display: grid;
+    place-items: center;
+    flex: 0 0 48px;
+    width: 48px;
+    height: 48px;
+    border-radius: 13px;
+    background: #fff;
+    color: var(--dark);
+    font-size: 29px;
+    letter-spacing: -2px;
+}
+
+.nav-label {
+    margin: 44px 12px 18px;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 1.2px;
+    color: #b2c9be;
+}
+
+.admin-sidebar nav {
+    display: grid;
+    gap: 9px;
+}
+
+.admin-sidebar nav a {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-height: 54px;
+    padding: 12px;
+    border-radius: 9px;
+    color: #d8e6df;
+    font-size: 15px;
+    font-weight: 600;
+}
+
+.admin-sidebar nav a:hover {
+    background: #ffffff10;
+}
+
+.admin-sidebar nav a.active {
+    background: #fff;
+    color: var(--dark);
+}
+
+.nav-number {
+    font-size: 12px;
+    opacity: 0.65;
+}
+
+.sidebar-footer {
+    display: grid;
+    gap: 8px;
+    margin-top: auto;
+    padding: 32px 8px 0;
+}
+
+.staff-link {
+    margin: 24px 0;
+    padding-top: 22px;
+    border-top: 1px solid #ffffff20;
+    font-size: 14px;
+    color: #d8e6df;
+}
+
+.muted-light {
+    color: #b2c9be;
+    font-size: 14px;
+}
+
+.logout {
+    width: 100%;
+    margin-top: 10px;
+    padding: 11px;
+    border: 1px solid #ffffff35;
+    border-radius: 8px;
+    background: transparent;
+    color: #fff;
+    cursor: pointer;
+}
+
+.admin-workspace {
+    min-width: 0;
+    margin-left: 256px;
+}
+
+.topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    min-height: 76px;
+    padding: 20px 36px;
+    border-bottom: 1px solid var(--line);
+    background: #ffffff;
+    font-size: 14px;
+}
+
+.topbar time {
+    white-space: nowrap;
+    color: var(--muted);
+}
+
+main {
+    padding: 36px;
+}
+
+.page-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.eyebrow {
+    margin-bottom: 10px;
+    color: var(--green);
+    font-size: 12px;
+    font-weight: 750;
+    letter-spacing: 1.7px;
+}
+
+.muted, .form-help {
+    color: var(--muted);
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: 1fr 1.3fr 1fr;
+    gap: 22px;
+    margin-bottom: 32px;
+}
+
+.stat-card {
+    min-width: 0;
+    padding: 27px;
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    background: #fff;
+}
+
+.stat-card p {
+    margin-bottom: 18px;
+}
+
+.stat-card strong {
+    display: block;
+    margin-bottom: 14px;
+    font-size: clamp(26px, 2.4vw, 38px);
+    line-height: 1.2;
+    overflow-wrap: anywhere;
+}
+
+.stat-card span {
+    color: var(--muted);
+    font-size: 14px;
+}
+
+.stat-card.revenue {
+    background: var(--green);
+    color: #fff;
+    border-color: var(--green);
+}
+
+.revenue span {
+    color: #d4e9df;
+}
+
+.panel {
+    min-width: 0;
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    background: #fff;
+    box-shadow: 0 5px 20px #143b2d04;
+}
+
+.panel-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+    padding: 24px;
+}
+
+.count {
+    padding: 5px 11px;
+    border-radius: 20px;
+    background: #edf4ef;
+    color: var(--green);
+    font-size: 14px;
+    white-space: nowrap;
+}
+
+.table-scroll {
+    overflow-x: auto;
+    padding-bottom: 10px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+}
+
+th {
+    background: #f7f9f7;
+    color: var(--muted);
+    font-size: 14px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+th, td {
+    padding: 18px 22px;
+    border-bottom: 1px solid #edf0ed;
+    vertical-align: middle;
+}
+
+td {
+    font-size: 15px;
+    overflow-wrap: anywhere;
+    max-width: 300px;
+}
+
+tbody tr:last-child td {
+    border-bottom: 0;
+}
+
+tbody tr:hover {
+    background: #fbfcfb;
+}
+
+td small {
+    display: block;
+    margin-top: 6px;
+    color: var(--muted);
+    font-size: 13px;
+}
+
+.money {
+    text-align: right;
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+}
+
+.badge {
+    display: inline-block;
+    padding: 5px 10px;
+    border-radius: 7px;
+    background: #f5efdf;
+    color: #75591e;
+    font-size: 14px;
+}
+
+.badge.available {
+    background: #eaf5ee;
+    color: #176244;
+}
+
+.management-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 330px;
+    align-items: start;
+    gap: 26px;
+}
+
+.editor {
+    position: sticky;
+    top: 24px;
+    padding: 26px;
+    scroll-margin-top: 24px;
+}
+
+.editor-form {
+    display: grid;
+    gap: 20px;
+    margin-top: 24px;
+}
+
+label {
+    display: grid;
+    gap: 8px;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+input, select {
+    width: 100%;
+    min-width: 0;
+    min-height: 46px;
+    padding: 10px 12px;
+    border: 1px solid #ccd9d0;
+    border-radius: 8px;
+    background: #fff;
+    color: var(--ink);
+    font-size: 16px;
+}
+
+.form-help {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 400;
+}
+
+.button {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 44px;
+    padding: 10px 16px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: #fff;
+    color: var(--ink);
+    font-size: 14px;
+    font-weight: 650;
+    cursor: pointer;
+    text-align: center;
+}
+
+.button:hover {
+    background: #edf5ef;
+}
+
+.button.primary {
+    background: var(--green);
+    border-color: var(--green);
+    color: #fff;
+}
+
+.button.primary:hover {
+    background: var(--dark);
+}
+
+.button.small {
+    min-height: 38px;
+    padding: 7px 12px;
+}
+
+.button.danger {
+    color: #a23e34;
+    border-color: #edd7d1;
+    background: #fff9f7;
+}
+
+.row-actions, .form-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.row-actions form {
+    margin: 0;
+}
+
+.status-form {
+    margin-top: 6px;
+}
+
+.text-button {
+    padding: 7px 0;
+    border: 0;
+    background: none;
+    color: var(--green);
+    cursor: pointer;
+    font-size: 14px;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+}
+
+.notice {
+    margin-bottom: 24px;
+    padding: 16px 20px;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+}
+
+.notice.error {
+    color: #8d352b;
+    background: #fff1ed;
+    border-color: #efcec4;
+}
+
+.notice.success {
+    color: #175d3d;
+    background: #eaf5ee;
+    border-color: #c5dfcf;
+}
+
+.empty {
+    padding: 44px 24px;
+    text-align: center;
+    color: var(--muted);
+}
+
+.skip-link {
+    position: fixed;
+    top: -100px;
+    left: 20px;
+    z-index: 10;
+    padding: 12px;
+    background: #fff;
+}
+
+.skip-link:focus {
+    top: 10px;
+}
+
+.login-screen {
+    display: grid;
+    min-height: 100dvh;
+    place-items: center;
+    padding: 24px;
+    background: var(--dark);
+}
+
+.login-card {
+    width: min(100%, 460px);
+    padding: 40px;
+    border-radius: 18px;
+    background: #fff;
+}
+
+.login-brand {
+    margin-bottom: 36px;
+    font-size: 16px;
+    letter-spacing: 1px;
+}
+
+.login-brand .brand-mark {
+    background: var(--green);
+    color: #fff;
+}
+
+.login-card h1 {
+    margin-bottom: 12px;
+}
+
+@media (max-width: 1250px) {
+    .management-grid {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .editor {
+        position: static;
+    }
+
+    .editor-form {
+        max-width: 600px;
+    }
+
+    .stats-grid {
+        gap: 14px;
+    }
+
+    .stat-card {
+        padding: 20px;
+    }
+}
+
+@media (max-width: 900px) {
+    .admin-sidebar {
+        position: static;
+        width: 100%;
+        padding: 20px;
+    }
+
+    .admin-sidebar nav {
+        grid-template-columns: repeat(auto-fit, minmax(175px, 1fr));
+    }
+
+    .nav-label {
+        margin: 24px 0 12px;
+    }
+
+    .sidebar-footer {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 16px;
+        padding: 16px 0 0;
+    }
+
+    .staff-link, .logout {
+        margin: 0;
+        padding: 8px;
+        border: 0;
+    }
+
+    .admin-workspace {
+        margin-left: 0;
+    }
+
+    main, .topbar {
+        padding: 24px;
+    }
+}
+
+@media (max-width: 600px) {
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .page-heading, .topbar {
+        align-items: flex-start;
+        flex-wrap: wrap;
+    }
+
+    main {
+        padding: 24px 16px;
+    }
+
+    .panel-heading, .editor {
+        padding: 20px;
+    }
+
+    .login-card {
+        padding: 28px;
+    }
+}
+
+/* Dashboard: các nhóm thông tin có khoảng cách và kích thước nhất quán. */
+.dashboard-page {
+    max-width: 1680px;
+    margin: 0 auto;
+    padding: 36px;
+}
+
+.dashboard-page .page-heading {
+    margin-bottom: 28px;
+}
+
+.dashboard-filter {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: 16px;
+    margin: 0 0 28px;
+    padding: 24px 28px;
+    border-radius: 14px;
+    border-left: 4px solid var(--green);
+    box-shadow: 0 4px 18px #103b3006;
+}
+
+.dashboard-filter label {
+    flex: 0 1 248px;
+    min-width: 0;
+    gap: 10px;
+    color: #455c51;
+}
+
+.dashboard-filter input[type="date"] {
+    min-height: 48px;
+    padding: 11px 14px;
+    background: #f8faf9;
+    font-weight: 600;
+    color: var(--ink);
+}
+
+.dashboard-filter .button {
+    min-height: 48px;
+    padding: 12px 20px;
+}
+
+.dashboard-filter p {
+    display: flex;
+    flex-direction: column;
+    align-self: center;
+    gap: 4px;
+    margin: 0 0 0 auto;
+    padding-left: 24px;
+    border-left: 1px solid var(--line);
+    font-size: 14px;
+}
+
+.dashboard-filter p strong {
+    color: var(--green);
+    font-size: 20px;
+    font-variant-numeric: tabular-nums;
+}
+
+.dashboard-page .stats-grid {
+    grid-template-columns: 1fr 1.25fr 1fr;
+    align-items: stretch;
+    gap: 24px;
+    margin-bottom: 24px;
+}
+
+.dashboard-page .stat-card {
+    display: flex;
+    flex-direction: column;
+    min-height: 204px;
+    padding: 28px;
+    border-radius: 14px;
+    box-shadow: 0 5px 20px #103b3005;
+}
+
+.dashboard-page .stat-card p {
+    margin-bottom: 24px;
+    font-size: 15px;
+    font-weight: 600;
+    color: #54695e;
+}
+
+.dashboard-page .stat-card strong {
+    margin-bottom: 20px;
+    font-size: clamp(28px, 2.7vw, 42px);
+    font-weight: 750;
+    letter-spacing: -1px;
+    font-variant-numeric: tabular-nums;
+}
+
+.dashboard-page .stat-card span {
+    margin-top: auto;
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+.dashboard-page .stat-card.revenue {
+    background: linear-gradient(120deg, #124f3e, #19765a);
+    border-color: transparent;
+    box-shadow: 0 8px 22px #14634d20;
+}
+
+.dashboard-page .revenue p {
+    color: #edf7f1;
+}
+
+.payment-breakdown {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr));
+    gap: 24px;
+    margin-bottom: 32px;
+}
+
+.payment-card {
+    min-width: 0;
+    min-height: 138px;
+    padding: 24px 28px;
+    background: #f6fbf8;
+    border: 1px solid #cfe3d7;
+    border-top: 3px solid #378463;
+    border-radius: 12px;
+}
+
+.payment-card:nth-child(2) {
+    background: #f5f9fd;
+    border-color: #d7e3ef;
+    border-top-color: #4c7ea4;
+}
+
+.payment-card:nth-child(3) {
+    background: #f9f7fc;
+    border-color: #e2dcee;
+    border-top-color: #8870a4;
+}
+
+.payment-card p {
+    margin: 0 0 16px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #516459;
+}
+
+.payment-card strong {
+    display: block;
+    color: var(--ink);
+    font-size: clamp(23px, 2vw, 30px);
+    line-height: 1.3;
+    letter-spacing: -0.4px;
+    overflow-wrap: anywhere;
+    font-variant-numeric: tabular-nums;
+}
+
+.dashboard-page > .panel .panel-heading {
+    padding: 26px 28px;
+    border-bottom: 1px solid var(--line);
+}
+
+.dashboard-page .panel-heading h2 {
+    font-size: 20px;
+}
+
+.dashboard-page .panel-heading .muted {
+    padding: 6px 12px;
+    border-radius: 20px;
+    background: #eef4f0;
+    color: var(--green);
+    font-size: 14px;
+}
+
+.dashboard-page th,
+.dashboard-page td {
+    padding: 18px 24px;
+}
+
+.dashboard-page .empty {
+    padding: 52px 24px;
+    background: #fff;
+    font-size: 15px;
+}
+
+@media (max-width: 1200px) {
+    .dashboard-filter p {
+        flex-direction: row;
+        flex-wrap: wrap;
+        align-items: baseline;
+        flex-basis: 100%;
+        margin: 0;
+        padding: 12px 0 0;
+        border-left: 0;
+        border-top: 1px solid var(--line);
+    }
+
+    .dashboard-filter p strong {
+        font-size: 16px;
+    }
+
+    .dashboard-page .stats-grid {
+        gap: 16px;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .dashboard-page .stat-card {
+        padding: 22px;
+    }
+}
+
+@media (max-width: 700px) {
+    .dashboard-page {
+        padding: 24px 16px;
+    }
+
+    .dashboard-filter {
+        padding: 20px;
+        gap: 12px;
+    }
+
+    .dashboard-filter label {
+        flex-basis: 100%;
+    }
+
+    .dashboard-filter .button {
+        flex: 1 1 auto;
+    }
+
+    .dashboard-page .stats-grid,
+    .payment-breakdown {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+
+    .dashboard-page .stat-card {
+        min-height: 176px;
+    }
+}
+/* Nhận diện RESTAURANT và tinh chỉnh giao diện quản trị. */
+.admin-sidebar {
+    background: linear-gradient(180deg, #103f32 0%, #0a2e25 100%);
+    box-shadow: 8px 0 30px rgba(15, 56, 44, 0.08);
+}
+
+.admin-sidebar .brand {
+    display: grid;
+    gap: 4px;
+    padding: 14px 12px;
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    border-radius: 10px;
+    color: #ffffff;
+    font-size: 18px;
+    font-weight: 800;
+    line-height: 1.2;
+    letter-spacing: 2.4px;
+}
+
+.admin-sidebar .brand-role {
+    color: #b9cfc5;
+    font-size: 11px;
+    font-weight: 650;
+    letter-spacing: 2px;
+}
+
+.admin-sidebar nav a {
+    border: 1px solid transparent;
+    transition: background-color 150ms ease, color 150ms ease;
+}
+
+.admin-sidebar nav a.active {
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+}
+
+.topbar {
+    min-height: 72px;
+    padding-inline: clamp(22px, 3vw, 42px);
+    background: rgba(255, 255, 255, 0.96);
+}
+
+.admin-workspace main {
+    max-width: 1680px;
+    margin: 0 auto;
+    padding: 34px clamp(22px, 3vw, 42px) 48px;
+}
+
+.panel,
+.stat-card {
+    border-color: #d7e3dc;
+    box-shadow: 0 8px 25px rgba(20, 65, 50, 0.06);
+}
+
+.button {
+    transition: background-color 150ms ease, border-color 150ms ease, transform 150ms ease;
+}
+
+.button:hover {
+    transform: translateY(-1px);
+}
+
+.login-screen {
+    background:
+        radial-gradient(circle at 20% 20%, rgba(41, 129, 98, 0.28), transparent 32rem),
+        linear-gradient(145deg, #0b2e25, #155642);
+}
+
+.login-card {
+    border: 1px solid rgba(255, 255, 255, 0.35);
+    box-shadow: 0 28px 70px rgba(4, 27, 20, 0.3);
+}
+
+.login-brand {
+    display: block;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--line);
+    color: var(--green);
+    font-size: 20px;
+    font-weight: 800;
+    letter-spacing: 3px;
+}
+
+@media (max-width: 900px) {
+    .admin-sidebar .brand {
+        max-width: 240px;
+    }
+}

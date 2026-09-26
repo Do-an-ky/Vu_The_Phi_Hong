@@ -1,0 +1,4 @@
+Chép đè thư mục views vào C:\xampp\htdocs\restaurant.
+Bỏ dòng Phiếu bếp chung · Order ở khu vực bếp.
+Theo dõi order có một nút In lại toàn bộ món của bàn (cùng lượt khách), gồm món gọi bổ sung.
+Các nút In món mới vẫn giữ cho lần gọi chưa gửi bếp. In lại toàn bàn không gửi lại món hoặc đổi trạng thái.
