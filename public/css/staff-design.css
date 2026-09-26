@@ -1,0 +1,313 @@
+/* Giao diện nhân viên. Không thay đổi xử lý bàn, order và thanh toán. */
+@media screen {
+    body.staff-shell {
+        background: #f7f9fc;
+        color: #102a3b;
+        font-family: "Segoe UI", Arial, sans-serif;
+    }
+
+    .staff-shell > .sidebar {
+        width: 254px;
+        padding: 22px 12px;
+        background: #0c3326;
+        border: 0;
+        box-shadow: none;
+    }
+
+    .staff-shell > .workspace {
+        margin-left: 254px;
+        min-width: 0;
+    }
+
+    .staff-shell > .sidebar .brand {
+        padding: 5px 6px 12px;
+        border: 0;
+        font-size: 21px;
+        letter-spacing: 1.5px;
+        background: transparent;
+    }
+
+    .staff-shell > .sidebar .nav-label {
+        margin: 14px 6px 12px;
+        font-size: 11px;
+        letter-spacing: 0.6px;
+    }
+
+    .staff-shell > .sidebar nav {
+        gap: 7px;
+    }
+
+    .staff-shell > .sidebar nav a {
+        min-height: 44px;
+        padding: 11px 13px;
+        border-radius: 8px;
+        box-shadow: none;
+    }
+
+    .staff-shell > .sidebar .nav-text {
+        font-size: 14px;
+        font-weight: 600;
+    }
+
+    .staff-shell > .sidebar nav .admin-return-link {
+        min-height: 38px;
+        margin-bottom: 12px;
+        padding: 9px;
+        background: #f3e5c7;
+        border-color: #f3e5c7;
+        font-size: 12px;
+        box-shadow: none;
+    }
+
+    .staff-shell > .sidebar .sidebar-bottom {
+        padding-top: 16px;
+        font-size: 12px;
+    }
+
+    .staff-shell > .sidebar .sidebar-bottom .button {
+        min-height: 36px;
+        padding: 8px;
+        font-size: 12px;
+        border-radius: 7px;
+    }
+
+    .staff-shell .workspace > header {
+        height: auto;
+        min-height: 68px;
+        padding: 16px 32px;
+        gap: 16px;
+        background: #ffffff;
+        border-bottom: 1px solid #dfe6ee;
+        font-size: 13px;
+    }
+
+    .staff-header-profile {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        color: #102a3b;
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+    .staff-avatar {
+        display: grid;
+        place-items: center;
+        flex: 0 0 32px;
+        height: 32px;
+        border-radius: 50%;
+        background: #0c3326;
+        color: #ffffff;
+        font-size: 10px;
+    }
+
+    .staff-tables-page .workspace > main {
+        max-width: none;
+        padding: 30px 32px 40px;
+    }
+
+    .staff-tables-page .page-heading {
+        margin-bottom: 22px;
+    }
+
+    .staff-tables-page .page-heading .eyebrow {
+        margin-bottom: 4px;
+        color: #173c2e;
+        font-size: 11px;
+        letter-spacing: 0.6px;
+    }
+
+    .staff-tables-page .page-heading h1 {
+        margin: 0 0 6px;
+        font-size: 29px;
+        line-height: 1.25;
+        color: #102a3b;
+    }
+
+    .staff-tables-page .page-heading p:not(.eyebrow) {
+        margin: 0;
+        color: #74869d;
+        font-size: 14px;
+    }
+
+    .staff-tables-page .table-overview {
+        gap: 16px;
+        margin-bottom: 28px;
+    }
+
+    .staff-tables-page .table-filter {
+        min-height: 68px;
+        padding: 16px 24px;
+        border-color: #dce5f0;
+        border-radius: 10px;
+        color: #193044;
+        font-size: 14px;
+        box-shadow: none;
+    }
+
+    .staff-tables-page .table-filter strong {
+        color: inherit;
+        font-size: 25px;
+    }
+
+    .staff-tables-page .table-filter.is-active {
+        background: #0c3326;
+        border-color: #0c3326;
+        color: #ffffff;
+    }
+
+    .staff-tables-page .table-toolbar {
+        margin-bottom: 16px;
+    }
+
+    .staff-tables-page .table-toolbar h2 {
+        margin-bottom: 3px;
+        font-size: 16px;
+    }
+
+    .staff-tables-page .table-toolbar p {
+        color: #74869d;
+        font-size: 13px;
+    }
+
+    .staff-tables-page .table-directory {
+        grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+        gap: 16px;
+    }
+
+    .staff-tables-page .table-directory .table-card {
+        min-height: 210px;
+        padding: 16px;
+        border: 1px solid #dce5f0;
+        border-radius: 12px;
+        box-shadow: 0 2px 5px rgba(29, 51, 71, 0.03);
+    }
+
+    .staff-tables-page .table-directory .is-occupied {
+        background: #fff8ef;
+        border-color: #ffc080;
+    }
+
+    .staff-tables-page .table-directory .is-payment {
+        background: #fff9e9;
+        border-color: #eac46f;
+    }
+
+    .staff-tables-page .table-card-heading {
+        margin-bottom: 12px;
+    }
+
+    .staff-tables-page .table-symbol {
+        width: 30px;
+        height: 30px;
+        border-radius: 7px;
+        background: #f0f4f8;
+        color: #78605b;
+        font-size: 21px;
+    }
+
+    .staff-tables-page .table-state {
+        padding: 4px 9px;
+        background: #dcfce7;
+        color: #16814b;
+        font-size: 11px;
+    }
+
+    .staff-tables-page .is-occupied .table-state {
+        background: #ffedd5;
+        color: #c3480a;
+    }
+
+    .staff-tables-page .is-payment .table-state {
+        background: #fef0c7;
+        color: #946200;
+    }
+
+    .staff-tables-page .table-directory h2 {
+        margin-bottom: 5px;
+        color: #102a3b;
+        font-size: 21px;
+    }
+
+    .staff-tables-page .table-description {
+        margin-bottom: 8px;
+        color: #74869d;
+        font-size: 12px;
+    }
+
+    .staff-tables-page .table-order-total,
+    .staff-tables-page .table-available {
+        padding: 0;
+        margin-bottom: 14px;
+        border: 0;
+        font-size: 12px;
+    }
+
+    .staff-tables-page .table-order-total strong {
+        color: #cf470a;
+        font-size: 15px;
+    }
+
+    .staff-tables-page .table-directory .button {
+        min-height: 38px;
+        padding: 9px 10px;
+        border-radius: 8px;
+        font-size: 12px;
+        line-height: 1.4;
+        box-shadow: none;
+    }
+
+    .staff-tables-page .table-directory .primary {
+        background: #0c3326;
+        border-color: #0c3326;
+    }
+
+    .staff-tables-page .table-directory .table-tracking-button {
+        background: #ec5808;
+        border-color: #ec5808;
+        color: #ffffff;
+    }
+
+    .staff-tables-page .table-directory .table-tracking-button:hover {
+        background: #cb4600;
+        border-color: #cb4600;
+    }
+}
+
+@media screen and (max-width: 900px) {
+    .staff-shell > .sidebar {
+        position: static;
+        width: 100%;
+        height: auto;
+        padding: 16px;
+    }
+
+    .staff-shell > .workspace {
+        margin-left: 0;
+    }
+
+    .staff-header-profile {
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .staff-shell .workspace > header {
+        flex-wrap: wrap;
+        padding: 16px 20px;
+    }
+
+    .staff-tables-page .workspace > main {
+        padding: 24px 20px;
+    }
+}
+
+@media screen and (max-width: 540px) {
+    .staff-tables-page .table-directory {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .staff-tables-page .table-filter {
+        padding: 12px;
+        font-size: 12px;
+    }
+}

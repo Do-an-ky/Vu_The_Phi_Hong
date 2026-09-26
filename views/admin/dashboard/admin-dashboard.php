@@ -1,73 +1,88 @@
-<?php $displayDate = date('d/m/Y', strtotime($stats['date'])); ?>
-<form method="get" action="admin.php" class="panel dashboard-filter">
-    <input type="hidden" name="page" value="dashboard">
-    <label for="dashboard-date">Chọn ngày xem thống kê
-        <input id="dashboard-date" type="date" name="date" min="1000-01-01" max="9999-12-31" value="<?php echo e($stats['date']); ?>" required>
-    </label>
-    <button class="button primary" type="submit">Xem thống kê</button>
-    <a class="button" href="admin.php?page=dashboard">Hôm nay</a>
-    <p class="muted">Đang xem ngày <strong><?php echo e($displayDate); ?></strong></p>
-</form>
-<section class="stats-grid" aria-label="Thống kê ngày đã chọn">
-    <article class="stat-card">
-        <p>Tổng số đơn ngày <?php echo e($displayDate); ?></p>
-        <strong><?php echo e($stats['orders']); ?></strong>
-        <span>Đơn tạo trong ngày, gồm cả đơn đã hủy</span>
-    </article>
-    <article class="stat-card revenue">
-        <p>Doanh thu ngày <?php echo e($displayDate); ?></p>
-        <strong><?php echo tien($stats['revenue']); ?></strong>
-        <span>Tính theo thời điểm thanh toán</span>
-    </article>
-    <article class="stat-card">
-        <p>Bàn đang sử dụng hiện tại</p>
-        <strong><?php echo e($stats['tables']); ?></strong>
-        <span>Lượt phục vụ chưa kết thúc</span>
-    </article>
-</section>
-<section class="payment-breakdown" aria-label="Doanh thu theo phương thức thanh toán">
-    <article class="panel payment-card">
-        <p>Tiền mặt</p>
-        <strong><?php echo tien($stats['cash']); ?></strong>
-    </article>
-    <article class="panel payment-card">
-        <p>Chuyển khoản</p>
-        <strong><?php echo tien($stats['transfer']); ?></strong>
-    </article>
-    <article class="panel payment-card">
-        <p>Thẻ</p>
-        <strong><?php echo tien($stats['card']); ?></strong>
-    </article>
-    <?php if ((float) $stats['other'] != 0): ?>
-        <article class="panel payment-card">
-            <p>Khác / chưa xác định</p>
-            <strong><?php echo tien($stats['other']); ?></strong>
+<?php
+$displayDate = date('d/m/Y', strtotime($stats['date']));
+$channels = array(
+    array('Tiền mặt', $stats['cash'], 'cash', '₫'),
+    array('Chuyển khoản', $stats['transfer'], 'transfer', '↗'),
+    array('Thẻ', $stats['card'], 'card', '▣')
+);
+if ((float) $stats['other'] !== 0.0) {
+    $channels[] = array('Khác', $stats['other'], 'other', '＋');
+}
+?>
+<div class="admin-dashboard">
+    <section class="dashboard-control">
+        <div class="dashboard-control-copy">
+            <span class="dashboard-control-icon" aria-hidden="true">▦</span>
+            <div><h2>Thống kê theo ngày</h2><p>Đang xem dữ liệu ngày <strong><?php echo e($displayDate); ?></strong></p></div>
+        </div>
+        <form method="get" action="admin.php" class="dashboard-date-form">
+            <input type="hidden" name="page" value="dashboard">
+            <label for="dashboard-date">Ngày thống kê
+                <input id="dashboard-date" type="date" name="date" min="1000-01-01" max="9999-12-31" value="<?php echo e($stats['date']); ?>" onchange="this.form.submit()" required>
+            </label>
+            <a class="button" href="admin.php?page=dashboard">Hôm nay</a>
+        </form>
+    </section>
+
+    <section class="dashboard-kpis" aria-label="Chỉ số tổng quan">
+        <article class="dashboard-kpi orders">
+            <div class="kpi-top"><span class="kpi-icon">▤</span><span class="kpi-label">Hóa đơn đã thanh toán</span></div>
+            <strong><?php echo e($stats['invoices']); ?></strong>
+            <p>Hóa đơn của các order được tạo ngày <?php echo e($displayDate); ?></p>
         </article>
-    <?php endif; ?>
-</section>
-<section class="panel">
-    <div class="panel-heading">
-        <h2>Đơn hàng ngày <?php echo e($displayDate); ?></h2>
-        <span class="muted"><?php echo e($stats['orders']); ?> đơn tạo trong ngày</span>
-    </div>
-    <div class="table-scroll">
-        <table>
-            <thead><tr><th>Mã đơn</th><th>Bàn</th><th>Nhân viên</th><th>Thời gian</th><th class="money">Tổng tiền</th><th>Trạng thái</th></tr></thead>
-            <tbody>
-                <?php foreach ($stats['day_orders'] as $order): ?>
-                    <tr>
-                        <td><strong>#<?php echo e($order['id']); ?></strong></td>
-                        <td><?php echo e($order['table_name'] ?? '—'); ?></td>
-                        <td><?php echo e($order['staff_name'] ?? '—'); ?></td>
-                        <td><?php echo e(date('d/m H:i', strtotime($order['created_at']))); ?></td>
-                        <td class="money"><?php echo tien($order['total']); ?></td>
-                        <td><span class="badge"><?php echo e($order['status']); ?></span></td>
-                    </tr>
-                <?php endforeach; ?>
-                <?php if (!$stats['day_orders']): ?>
-                    <tr><td colspan="6" class="empty">Không có đơn hàng trong ngày đã chọn.</td></tr>
-                <?php endif; ?>
-            </tbody>
-        </table>
-    </div>
-</section>
+        <article class="dashboard-kpi revenue">
+            <div class="kpi-top"><span class="kpi-icon">₫</span><span class="kpi-label">Doanh thu</span></div>
+            <strong><?php echo tien($stats['revenue']); ?></strong>
+            <p>Doanh thu theo ngày tạo order</p>
+        </article>
+        <article class="dashboard-kpi tables">
+            <div class="kpi-top"><span class="kpi-icon">▦</span><span class="kpi-label">Bàn đang sử dụng</span></div>
+            <strong><?php echo e($stats['tables']); ?></strong>
+            <p>Lượt phục vụ đang hoạt động hiện tại</p>
+        </article>
+    </section>
+
+    <section class="dashboard-revenue-panel">
+        <div class="dashboard-section-heading">
+            <div><p class="eyebrow">CƠ CẤU DOANH THU</p><h2>Phương thức thanh toán</h2></div>
+            <div class="revenue-total"><span>Tổng doanh thu</span><strong><?php echo tien($stats['revenue']); ?></strong></div>
+        </div>
+        <div class="revenue-channels">
+            <?php foreach ($channels as $channel): ?>
+                <article class="revenue-channel <?php echo e($channel[2]); ?>">
+                    <div class="channel-heading"><span class="channel-icon"><?php echo e($channel[3]); ?></span><span><?php echo e($channel[0]); ?></span></div>
+                    <strong><?php echo tien($channel[1]); ?></strong>
+                </article>
+            <?php endforeach; ?>
+        </div>
+    </section>
+
+    <section class="dashboard-orders-panel">
+        <div class="dashboard-section-heading">
+            <div><p class="eyebrow">THANH TOÁN TRONG NGÀY</p><h2>Hóa đơn ngày <?php echo e($displayDate); ?></h2></div>
+            <span class="dashboard-order-count"><?php echo e($stats['invoices']); ?> hóa đơn</span>
+        </div>
+        <div class="table-scroll">
+            <table class="dashboard-orders-table">
+                <thead><tr><th>Hóa đơn</th><th>Order</th><th>Bàn</th><th>Nhân viên</th><th>Giờ tạo đơn</th><th>Thanh toán lúc</th><th>Phương thức</th><th class="money">Tổng tiền</th></tr></thead>
+                <tbody>
+                    <?php foreach ($stats['day_invoices'] as $order): ?>
+                        <tr>
+                            <td><strong class="order-code">#<?php echo e($order['id']); ?></strong></td>
+                            <td>#<?php echo e($order['order_id']); ?></td>
+                            <td><strong><?php echo e($order['table_name'] ?? '—'); ?></strong></td>
+                            <td><?php echo e($order['staff_name'] ?? '—'); ?></td>
+                            <td><?php echo e(date('H:i', strtotime($order['order_created_at']))); ?></td>
+                            <td><?php echo e(date('d/m H:i', strtotime($order['paid_at']))); ?></td>
+                            <td><span class="dashboard-status paid"><?php echo e($order['payment_method']); ?></span></td>
+                            <td class="money"><strong><?php echo tien($order['total']); ?></strong></td>
+                        </tr>
+                    <?php endforeach; ?>
+                    <?php if (!$stats['day_invoices']): ?>
+                        <tr><td colspan="8"><div class="dashboard-empty"><span>▤</span><strong>Chưa có hóa đơn</strong><p>Chưa có order của ngày này được thanh toán.</p></div></td></tr>
+                    <?php endif; ?>
+                </tbody>
+            </table>
+        </div>
+    </section>
+</div>

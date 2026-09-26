@@ -10,31 +10,31 @@ if ($order['status'] !== 'Đang phục vụ') {
     return;
 }
 $products = $model->products();
-$quantities = $errorMessage === '' ? ($_POST['quantity'] ?? array()) : array();
-$notes = $errorMessage === '' ? ($_POST['note'] ?? array()) : array();
-if (!is_array($notes)) {
-    throw new DomainException('Ghi chú không hợp lệ.');
-}
-if (!is_array($quantities)) {
-    $quantities = array();
-}
 $requestKey = $orderDraft['request_key'] ?? '';
 $isReview = ($_POST['action'] ?? '') === 'review' && $errorMessage === '';
+$draftItems = $orderDraft['items'] ?? array();
+if (!$isReview && ($_POST['action'] ?? '') === 'edit' && $errorMessage === '') {
+    $draftItems = docMonTuForm(
+        $_POST['product_id'] ?? array(),
+        $_POST['quantity'] ?? array(),
+        $_POST['note'] ?? array()
+    );
+}
 $items = array();
 $total = 0;
 $categories = array();
+$productsById = array_column($products, null, 'id');
 foreach ($products as $product) {
     $categoryName = $product['category'] ?? 'Chưa phân loại';
     $categories[$categoryName] = true;
-    $quantity = filter_var($quantities[$product['id']] ?? 0, FILTER_VALIDATE_INT);
-    if ($quantity === false || $quantity < 0 || $quantity > 99) {
-        throw new DomainException('Số lượng mỗi món phải từ 0 đến 99.');
-    }
-    if ($quantity > 0) {
-        $product['quantity'] = $quantity;
-        $product['note'] = ghiChuMon($notes[$product['id']] ?? '');
+}
+foreach ($draftItems as $draftItem) {
+    $product = $productsById[$draftItem['product_id']] ?? null;
+    if ($product) {
+        $product['quantity'] = $draftItem['quantity'];
+        $product['note'] = $draftItem['note'];
         $items[] = $product;
-        $total += $quantity * $product['price'];
+        $total += $draftItem['quantity'] * $product['price'];
     }
 }
 ?>
@@ -56,8 +56,9 @@ foreach ($products as $product) {
             <input type="hidden" name="order_id" value="<?php echo $id; ?>">
             <input type="hidden" name="request_key" value="<?php echo $requestKey; ?>">
             <?php foreach ($items as $item): ?>
-                <input type="hidden" name="quantity[<?php echo $item['id']; ?>]" value="<?php echo $item['quantity']; ?>">
-                <input type="hidden" name="note[<?php echo $item['id']; ?>]" value="<?php echo e($item['note']); ?>">
+                <input type="hidden" name="product_id[]" value="<?php echo $item['id']; ?>">
+                <input type="hidden" name="quantity[]" value="<?php echo $item['quantity']; ?>">
+                <input type="hidden" name="note[]" value="<?php echo e($item['note']); ?>">
             <?php endforeach; ?>
             <p class="muted">Giá được lấy từ thực đơn tại lúc xác nhận. Sau xác nhận, in phiếu rồi chuyển bếp.</p>
             <div class="actions">
@@ -99,22 +100,13 @@ foreach ($products as $product) {
                     <input id="search" class="search" type="search" placeholder="Tìm món…" aria-label="Tìm món">
                     <div class="menu-grid">
                         <?php foreach ($products as $product): ?>
-                            <article class="menu-item" data-name="<?php echo e($product['name']); ?>" data-category="<?php echo e($product['category'] ?? 'Chưa phân loại'); ?>" data-price="<?php echo e($product['price']); ?>">
+                            <article class="menu-item" data-id="<?php echo $product['id']; ?>" data-name="<?php echo e($product['name']); ?>" data-category="<?php echo e($product['category'] ?? 'Chưa phân loại'); ?>" data-price="<?php echo e($product['price']); ?>">
                                 <p class="food-category"><?php echo e($product['category']); ?></p>
                                 <h3><?php echo e($product['name']); ?></h3>
                                 <strong><?php echo tien($product['price']); ?></strong>
                                 <button type="button" class="button dish-action" data-edit-dish>
-                                    <span>＋</span> Chọn món
+                                    <span>＋</span> Thêm vào phiếu
                                 </button>
-                                <div class="quantity">
-                                    <button type="button" data-step="-1" aria-label="Giảm <?php echo e($product['name']); ?>">−</button>
-                                    <input class="quantity-input" name="quantity[<?php echo $product['id']; ?>]" value="<?php echo (int) ($quantities[$product['id']] ?? 0); ?>" type="number" min="0" max="99" required aria-label="Số lượng <?php echo e($product['name']); ?>">
-                                    <button type="button" data-step="1" aria-label="Tăng <?php echo e($product['name']); ?>">+</button>
-                                    <button type="button" data-clear="yes" class="remove">Xóa</button>
-                                </div>
-                                <label class="dish-note-label">Ghi chú cho món
-                                    <textarea class="dish-note" name="note[<?php echo $product['id']; ?>]" maxlength="300" rows="2"><?php echo e(ghiChuMon($notes[$product['id']] ?? '')); ?></textarea>
-                                </label>
                                 <p class="dish-selection muted"></p>
                             </article>
                         <?php endforeach; ?>
@@ -134,7 +126,9 @@ foreach ($products as $product) {
                 <button class="button primary full" name="action" value="review">Kiểm tra & xác nhận →</button>
             </aside>
         </div>
+        <div id="draft-fields"></div>
     </form>
+    <script id="draft-items-data" type="application/json"><?php echo json_encode($draftItems, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT); ?></script>
     <dialog id="dish-modal" aria-labelledby="dish-modal-title" aria-describedby="dish-modal-help">
         <form id="dish-modal-form">
             <div class="card-top">

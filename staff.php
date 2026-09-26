@@ -20,6 +20,7 @@ $errorMessage = '';
 $user = null;
 $model = null;
 $orderDraft = null;
+$sidebarCounts = array('tables' => 0, 'orders' => 0, 'kitchen' => 0, 'payments' => 0);
 
 try {
     $model = new Restaurant();
@@ -48,6 +49,9 @@ try {
         }
         $orderDraft = xuLyNhanVien($model, $user);
     }
+    if ($user) {
+        $sidebarCounts = $model->sidebarNotifications();
+    }
 } catch (DomainException $error) {
     $errorMessage = $error->getMessage();
 } catch (Throwable $error) {
@@ -56,7 +60,27 @@ try {
 }
 
 if (!$user) {
+    if (($_SERVER['HTTP_X_REQUESTED_WITH'] ?? '') === 'KitchenFetch') {
+        header('Content-Type: application/json; charset=utf-8');
+        http_response_code(401);
+        echo json_encode(array('success' => false, 'message' => 'Bạn cần đăng nhập lại.'));
+        exit;
+    }
     chuyenTrang('index.php');
+}
+
+if (($_SERVER['HTTP_X_REQUESTED_WITH'] ?? '') === 'KitchenFetch' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    header('Content-Type: application/json; charset=utf-8');
+    http_response_code(400);
+    echo json_encode(array('success' => false, 'message' => $errorMessage ?: 'Không thể lưu xác nhận.'));
+    exit;
+}
+
+// JavaScript gọi đường dẫn này để cập nhật số thông báo mà không tải lại trang.
+if (($_GET['api'] ?? '') === 'sidebar-counts') {
+    header('Content-Type: application/json; charset=utf-8');
+    echo json_encode($sidebarCounts);
+    exit;
 }
 
 $views = array(
@@ -95,24 +119,39 @@ try {
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title><?php echo e($title); ?>Restaurant</title>
-        <link rel="stylesheet" href="public/css/style.css?v=wide-sidebar-cart-1">
+        <title><?php echo e($title); ?> | RESTAURANT</title>
+        <link rel="stylesheet" href="public/css/style.css?v=<?php echo filemtime(__DIR__ . '/public/css/style.css'); ?>">
         <link rel="stylesheet" href="public/css/order-layout.css?v=cart-column-2">
-        <script defer src="public/js/script.js?v=wide-sidebar-cart-1"></script>
+        <link rel="stylesheet" href="public/css/item-progress.css?v=1">
+        <script defer src="public/js/script.js?v=<?php echo filemtime(__DIR__ . '/public/js/script.js'); ?>"></script>
+        <link rel="stylesheet" href="public/css/ui-refresh.css?v=<?php echo filemtime(__DIR__ . '/public/css/ui-refresh.css'); ?>">
+        <link rel="stylesheet" href="public/css/staff-design.css?v=<?php echo filemtime(__DIR__ . '/public/css/staff-design.css'); ?>">
     </head>
-    <body>
+    <body class="staff-shell <?php if ($page === 'tables') echo 'staff-tables-page'; ?>">
         <aside class="sidebar no-print">
-            <a class="brand" href="?page=tables"><span class="brand-mark">H.</span> HỒNG</a>
+            <a class="brand" href="?page=tables">RESTAURANT</a>
             <div class="nav-label">KHÔNG GIAN NHÂN VIÊN</div>
             <?php if ($user): ?>
                 <nav>
                     <?php if ($user['role'] === 'admin'): ?>
-                        <a href="admin.php">← Khu vực quản trị</a>
+                        <a class="admin-return-link" href="admin.php">← Quay lại trang quản trị</a>
                     <?php endif; ?>
-                    <a href="?page=tables" class="<?php if ($page === 'tables') echo 'active'; ?>">▦ Quản lý bàn</a>
-                    <a href="?page=orders" class="<?php if ($page === 'orders') echo 'active'; ?>">＋ Gọi món</a>
-                    <a href="?page=kitchen" class="<?php if ($page === 'kitchen') echo 'active'; ?>">◷ Khu vực bếp</a>
-                    <a href="?page=payments" class="<?php if ($page === 'payments') echo 'active'; ?>">₫ Thanh toán</a>
+                    <a href="?page=tables" data-notification-link="tables" class="<?php if ($page === 'tables') echo 'active'; ?>">
+                        <span class="nav-text">▦ Quản lý bàn</span>
+                        <span class="nav-badge" data-notification="tables" <?php if ($sidebarCounts['tables'] === 0) echo 'hidden'; ?>><?php echo $sidebarCounts['tables']; ?></span>
+                    </a>
+                    <a href="?page=orders" data-notification-link="orders" class="<?php if ($page === 'orders') echo 'active'; ?>">
+                        <span class="nav-text">＋ Gọi món</span>
+                        <span class="nav-badge" data-notification="orders" <?php if ($sidebarCounts['orders'] === 0) echo 'hidden'; ?>><?php echo $sidebarCounts['orders']; ?></span>
+                    </a>
+                    <a href="?page=kitchen" data-notification-link="kitchen" class="<?php if ($page === 'kitchen') echo 'active'; ?>">
+                        <span class="nav-text">◷ Khu vực bếp</span>
+                        <span class="nav-badge" data-notification="kitchen" <?php if ($sidebarCounts['kitchen'] === 0) echo 'hidden'; ?>><?php echo $sidebarCounts['kitchen']; ?></span>
+                    </a>
+                    <a href="?page=payments" data-notification-link="payments" class="<?php if ($page === 'payments') echo 'active'; ?>">
+                        <span class="nav-text">₫ Thanh toán</span>
+                        <span class="nav-badge" data-notification="payments" <?php if ($sidebarCounts['payments'] === 0) echo 'hidden'; ?>><?php echo $sidebarCounts['payments']; ?></span>
+                    </a>
                 </nav>
                 <div class="sidebar-bottom">
                     <p><?php echo e($user['name']); ?></p>
@@ -126,7 +165,11 @@ try {
         <div class="workspace">
             <header class="no-print">
                 <span>Nhà hàng / <?php echo e($title); ?></span>
-                <span><?php echo date('d/m/Y H:i'); ?></span>
+                <div class="staff-header-profile">
+                    <time datetime="<?php echo date('c'); ?>"><?php echo date('H:i · d/m/Y'); ?></time>
+                    <span class="staff-avatar" aria-hidden="true">NV</span>
+                    <span class="staff-header-name"><?php echo e($user['name']); ?></span>
+                </div>
             </header>
             <main>
                 <?php if ($errorMessage !== ''): ?>

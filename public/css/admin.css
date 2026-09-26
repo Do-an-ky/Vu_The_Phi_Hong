@@ -837,3 +837,90 @@ input, select {
         min-height: 176px;
     }
 }
+/* Nhận diện RESTAURANT và tinh chỉnh giao diện quản trị. */
+.admin-sidebar {
+    background: linear-gradient(180deg, #103f32 0%, #0a2e25 100%);
+    box-shadow: 8px 0 30px rgba(15, 56, 44, 0.08);
+}
+
+.admin-sidebar .brand {
+    display: grid;
+    gap: 4px;
+    padding: 14px 12px;
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    border-radius: 10px;
+    color: #ffffff;
+    font-size: 18px;
+    font-weight: 800;
+    line-height: 1.2;
+    letter-spacing: 2.4px;
+}
+
+.admin-sidebar .brand-role {
+    color: #b9cfc5;
+    font-size: 11px;
+    font-weight: 650;
+    letter-spacing: 2px;
+}
+
+.admin-sidebar nav a {
+    border: 1px solid transparent;
+    transition: background-color 150ms ease, color 150ms ease;
+}
+
+.admin-sidebar nav a.active {
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+}
+
+.topbar {
+    min-height: 72px;
+    padding-inline: clamp(22px, 3vw, 42px);
+    background: rgba(255, 255, 255, 0.96);
+}
+
+.admin-workspace main {
+    max-width: 1680px;
+    margin: 0 auto;
+    padding: 34px clamp(22px, 3vw, 42px) 48px;
+}
+
+.panel,
+.stat-card {
+    border-color: #d7e3dc;
+    box-shadow: 0 8px 25px rgba(20, 65, 50, 0.06);
+}
+
+.button {
+    transition: background-color 150ms ease, border-color 150ms ease, transform 150ms ease;
+}
+
+.button:hover {
+    transform: translateY(-1px);
+}
+
+.login-screen {
+    background:
+        radial-gradient(circle at 20% 20%, rgba(41, 129, 98, 0.28), transparent 32rem),
+        linear-gradient(145deg, #0b2e25, #155642);
+}
+
+.login-card {
+    border: 1px solid rgba(255, 255, 255, 0.35);
+    box-shadow: 0 28px 70px rgba(4, 27, 20, 0.3);
+}
+
+.login-brand {
+    display: block;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--line);
+    color: var(--green);
+    font-size: 20px;
+    font-weight: 800;
+    letter-spacing: 3px;
+}
+
+@media (max-width: 900px) {
+    .admin-sidebar .brand {
+        max-width: 240px;
+    }
+}

@@ -25,6 +25,69 @@ function xuLyNhanVien($model, $user)
 
     try {
         switch ($action) {
+            case 'accept-table':
+            case 'ready-table':
+                $orderId = soNguyenDuong($_POST['order_id'] ?? null);
+                $model->lockOrder($orderId);
+                $status = $action === 'accept-table' ? 'Chờ bếp' : 'Đang nấu';
+                $tickets = $model->all("SELECT * FROM kitchen_tickets WHERE order_id = ? AND status = ? ORDER BY id", array($orderId, $status));
+                if (!$tickets) {
+                    throw new DomainException('Bàn chưa có món gửi tới bếp.');
+                }
+                $submitted = $_POST['ticket_ids'] ?? array();
+                $expected = array_map('strval', array_column($tickets, 'id'));
+                if (!is_array($submitted) || array_values($submitted) !== $expected) {
+                    throw new DomainException('Bàn có món mới hoặc phiếu đã thay đổi. Hãy tải lại bếp để kiểm tra.');
+                }
+                $selected = $_POST['detail_ids'] ?? array();
+                if (!is_array($selected)) {
+                    throw new DomainException('Danh sách món không hợp lệ.');
+                }
+                $selected = array_map('soNguyenDuong', $selected);
+                $owners = array();
+                foreach ($tickets as $ticket) {
+                    foreach ($model->ticketItems($ticket['id']) as $item) {
+                        $owners[$item['id']] = $ticket['id'];
+                    }
+                }
+                foreach ($selected as $detailId) {
+                    if (!isset($owners[$detailId])) {
+                        throw new DomainException('Món không thuộc bàn này.');
+                    }
+                }
+                foreach ($tickets as $ticket) {
+                    if ($action === 'accept-table' && $ticket['status'] === 'Chờ bếp') {
+                        $model->moveTicket($ticket['id'], 'accept', array());
+                    }
+                    if ($action === 'ready-table') {
+                        if ($ticket['status'] === 'Chờ bếp') {
+                            throw new DomainException('Hãy nhận các món mới trước khi hoàn thành.');
+                        }
+                        foreach ($model->ticketItems($ticket['id']) as $item) {
+                            if (in_array((int) $item['id'], $selected, true)) {
+                                $model->markTicketItem($ticket['id'], $item['id'], 'item-ready');
+                            } elseif (!$item['item_ready_at'] || !$item['item_served_at']) {
+                                throw new DomainException('Còn món chưa xác nhận hoàn thành.');
+                            }
+                        }
+                        if ($ticket['status'] === 'Đang nấu') {
+                            $model->moveTicket($ticket['id'], 'ready', array());
+                        }
+                    }
+                }
+                $redirect = '?page=kitchen';
+                break;
+            case 'item-ready':
+                if (($_POST['done'] ?? '') !== 'yes') {
+                    throw new DomainException('Hãy tích xác nhận món trước khi lưu.');
+                }
+                $id = $model->markTicketItem(
+                    soNguyenDuong($_POST['ticket_id'] ?? null),
+                    soNguyenDuong($_POST['detail_id'] ?? null),
+                    $action
+                );
+                $redirect = '?page=kitchen';
+                break;
             case 'open':
                 $id = $model->openTable(soNguyenDuong($_POST['table_id'] ?? null), $user['id']);
                 $redirect = '?page=orders&id=' . $id;
@@ -32,7 +95,7 @@ function xuLyNhanVien($model, $user)
             case 'confirm':
                 $draft = layPhieuDaKiemTra();
                 // Chỉ lưu bản đã kiểm tra trên server, không dùng giá/tổng từ form.
-                $id = $model->addTicket($draft['order_id'], $draft['quantity'], $draft['request_key'], $draft['note']);
+                $id = $model->addTicket($draft['order_id'], $draft['items'], $draft['request_key']);
                 $redirect = '?page=ticket&id=' . $id;
                 break;
             case 'send':
@@ -40,6 +103,19 @@ function xuLyNhanVien($model, $user)
             case 'ready':
             case 'check':
             case 'serve':
+                if ($action === 'ready') {
+                    $detailIds = $_POST['detail_ids'] ?? array();
+                    if (!is_array($detailIds) || count($detailIds) > 200) {
+                        throw new DomainException('Danh sách món xác nhận không hợp lệ.');
+                    }
+                    foreach ($detailIds as $detailId) {
+                        $model->markTicketItem(
+                            soNguyenDuong($_POST['ticket_id'] ?? null),
+                            soNguyenDuong($detailId),
+                            'item-ready'
+                        );
+                    }
+                }
                 if ($action === 'send' && ($_POST['printed'] ?? '') !== 'yes') {
                     throw new DomainException('Hãy xác nhận đã in phiếu thành công.');
                 }
@@ -67,10 +143,8 @@ function xuLyNhanVien($model, $user)
                 $redirect = '?page=invoice&id=' . $id;
                 break;
             case 'finish-receipt':
-                if (($_POST['printed'] ?? '') !== 'yes') {
-                    throw new DomainException('Hãy xác nhận đã in hóa đơn thành công.');
-                }
                 $model->finishReceipt(soNguyenDuong($_POST['payment_id'] ?? null));
+                $redirect = '?page=payments';
                 break;
             default:
                 throw new DomainException('Thao tác không hợp lệ.');
@@ -81,44 +155,43 @@ function xuLyNhanVien($model, $user)
         throw $error;
     }
 
+    if (($_SERVER['HTTP_X_REQUESTED_WITH'] ?? '') === 'KitchenFetch') {
+        header('Content-Type: application/json; charset=utf-8');
+        echo json_encode(array('success' => true));
+        exit;
+    }
     $_SESSION['message'] = 'Đã cập nhật thành công.';
     chuyenTrang($redirect);
 }
 
-// Kiểm tra toàn bộ dữ liệu gửi lên, kể cả món không có trong giao diện.
-function docMonTuForm($quantities, $notes)
+// Mỗi phần tử là một dòng món. Một sản phẩm có thể xuất hiện nhiều lần.
+function docMonTuForm($productIds, $quantities, $notes)
 {
-    if (!is_array($quantities) || count($quantities) > 200 ||
-        !is_array($notes) || count($notes) > 200) {
+    if (!is_array($productIds) || !is_array($quantities) || !is_array($notes) ||
+        count($productIds) > 200 || count($quantities) > 200 || count($notes) > 200 ||
+        array_keys($productIds) !== array_keys($quantities) ||
+        array_keys($productIds) !== array_keys($notes)) {
         throw new DomainException('Danh sách món không hợp lệ.');
     }
 
-    $result = array('quantity' => array(), 'note' => array());
-    foreach ($quantities as $id => $value) {
-        $id = soNguyenDuong($id);
+    $items = array();
+    foreach ($productIds as $index => $productId) {
+        $productId = soNguyenDuong($productId);
+        $value = $quantities[$index];
         if (!is_string($value) && !is_int($value)) {
             throw new DomainException('Số lượng không hợp lệ.');
         }
         $quantity = filter_var($value, FILTER_VALIDATE_INT);
-        if ($quantity === false || $quantity < 0 || $quantity > 99) {
-            throw new DomainException('Số lượng mỗi món phải từ 0 đến 99.');
+        if ($quantity === false || $quantity < 1 || $quantity > 99) {
+            throw new DomainException('Số lượng mỗi dòng món phải từ 1 đến 99.');
         }
-        $note = ghiChuMon($notes[$id] ?? '');
-        if ($quantity > 0) {
-            $result['quantity'][$id] = $quantity;
-            $result['note'][$id] = $note;
-        }
+        $items[] = array(
+            'product_id' => $productId,
+            'quantity' => $quantity,
+            'note' => ghiChuMon($notes[$index])
+        );
     }
-    foreach ($notes as $id => $note) {
-        soNguyenDuong($id);
-        ghiChuMon($note);
-        if (!array_key_exists($id, $quantities)) {
-            throw new DomainException('Ghi chú không khớp danh sách món.');
-        }
-    }
-    ksort($result['quantity']);
-    ksort($result['note']);
-    return $result;
+    return $items;
 }
 
 function kiemTraFormGoiMon($model, $action)
@@ -135,14 +208,20 @@ function kiemTraFormGoiMon($model, $action)
         throw new DomainException('Order không còn ở trạng thái đang phục vụ.');
     }
 
-    $draft = docMonTuForm($_POST['quantity'] ?? array(), $_POST['note'] ?? array());
+    $draft = array(
+        'items' => docMonTuForm(
+            $_POST['product_id'] ?? array(),
+            $_POST['quantity'] ?? array(),
+            $_POST['note'] ?? array()
+        )
+    );
     $products = array_column($model->products(), null, 'id');
-    foreach ($draft['quantity'] as $id => $quantity) {
-        if (!isset($products[$id])) {
+    foreach ($draft['items'] as $item) {
+        if (!isset($products[$item['product_id']])) {
             throw new DomainException('Món không tồn tại hoặc đã ngừng bán. Hãy tải lại thực đơn.');
         }
     }
-    if ($action === 'review' && count($draft['quantity']) === 0) {
+    if ($action === 'review' && count($draft['items']) === 0) {
         throw new DomainException('Hãy chọn ít nhất một món.');
     }
     if ($action === 'edit') {
@@ -183,11 +262,15 @@ function layPhieuDaKiemTra()
         throw new DomainException('Hãy kiểm tra món lại trước khi xác nhận phiếu.');
     }
     $orderId = soNguyenDuong($_POST['order_id'] ?? null);
-    $submitted = docMonTuForm($_POST['quantity'] ?? array(), $_POST['note'] ?? array());
+    $submitted = docMonTuForm(
+        $_POST['product_id'] ?? array(),
+        $_POST['quantity'] ?? array(),
+        $_POST['note'] ?? array()
+    );
     if ($orderId !== $draft['order_id'] ||
-        $submitted['quantity'] !== $draft['quantity'] ||
-        $submitted['note'] !== $draft['note']) {
+        $submitted !== $draft['items']) {
         throw new DomainException('Phiếu đã bị thay đổi. Hãy quay lại kiểm tra món.');
     }
     return $draft;
 }
+

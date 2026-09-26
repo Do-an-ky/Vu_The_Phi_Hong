@@ -1,5 +1,7 @@
 <?php
 
+date_default_timezone_set('Asia/Ho_Chi_Minh');
+
 // Cổng quản trị: xác thực -> controller -> model -> view.
 require_once __DIR__ . '/config/bootstrap.php';
 require_once __DIR__ . '/models/AdminModel.php';
@@ -137,14 +139,15 @@ try {
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title><?php echo e($title); ?> | HỒNG Admin</title>
+    <title><?php echo e($title); ?> | RESTAURANT Admin</title>
     <link rel="stylesheet" href="public/css/admin.css?v=<?php echo filemtime(__DIR__ . '/public/css/admin.css'); ?>">
     <script src="public/js/admin.js?v=<?php echo filemtime(__DIR__ . '/public/js/admin.js'); ?>" defer></script>
+    <link rel="stylesheet" href="public/css/ui-refresh.css?v=<?php echo filemtime(__DIR__ . '/public/css/ui-refresh.css'); ?>">
 </head>
-<body>
+<body class="admin-shell">
     <a class="skip-link" href="#main-content">Đến nội dung chính</a>
     <aside class="admin-sidebar">
-        <a class="brand" href="admin.php"><span class="brand-mark">A.</span>Admin</a>
+        <a class="brand" href="admin.php">RESTAURANT <span class="brand-role">ADMIN</span></a>
         <p class="nav-label">KHÔNG GIAN QUẢN TRỊ</p>
         <nav aria-label="Menu quản trị">
             <?php $number = 1; ?>
@@ -168,11 +171,11 @@ try {
     <div class="admin-workspace">
         <header class="topbar">
             <span>Nhà hàng <span class="muted">/</span> <?php echo e($title); ?></span>
-            <time datetime="<?php echo date('c'); ?>"><?php echo date('d/m/Y'); ?></time>
+            <time datetime="<?php echo date('c'); ?>"><?php echo date('H:i'); ?> · <?php echo date('d/m/Y'); ?></time>
         </header>
         <main id="main-content" class="<?php echo $page === 'dashboard' ? 'dashboard-page' : ''; ?>">
             <div class="page-heading">
-                <div><p class="eyebrow">HỒNG RESTAURANT · ADMIN</p><h1><?php echo e($title); ?></h1></div>
+                <div><p class="eyebrow">RESTAURANT · ADMIN</p><h1><?php echo e($title); ?></h1></div>
                 <?php if ($page !== 'dashboard'): ?>
                     <a class="button primary" href="admin.php?page=<?php echo e($page); ?>#editor">＋ Thêm mới</a>
                 <?php endif; ?>

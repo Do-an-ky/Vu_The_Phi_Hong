@@ -67,7 +67,8 @@ class Restaurant
 
     public function ticketItems($ticketId)
     {
-        return $this->all('SELECT d.id, k.product_name AS name, d.quantity, d.price, d.note
+        return $this->all('SELECT d.id, k.product_name AS name, d.quantity, d.price, d.note,
+                                 k.item_ready_at, k.item_served_at
                           FROM kitchen_ticket_items k
                           JOIN order_details d ON d.id = k.detail_id
                           WHERE k.ticket_id = ? ORDER BY k.id', array($ticketId));
@@ -88,6 +89,58 @@ class Restaurant
         $row = $this->one('SELECT COALESCE(SUM(quantity * price), 0) AS total
                           FROM order_details WHERE order_id = ?', array($orderId));
         return $row['total'];
+    }
+
+    // Lấy hóa đơn theo ngày thanh toán. Ngày luôn được kiểm tra lại ở server.
+    public function receiptsByDate($date)
+    {
+        if (!is_string($date) || !preg_match('/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/D', $date)) {
+            throw new DomainException('Ngày xem hóa đơn không hợp lệ.');
+        }
+        $day = DateTimeImmutable::createFromFormat('!Y-m-d', $date);
+        if (!$day || $day->format('Y-m-d') !== $date || (int) $day->format('Y') < 1000) {
+            throw new DomainException('Ngày xem hóa đơn không tồn tại. Hãy chọn lại ngày.');
+        }
+        $start = $day->format('Y-m-d') . ' 00:00:00';
+        $end = $day->modify('+1 day')->format('Y-m-d') . ' 00:00:00';
+        return $this->all(
+            'SELECT p.id, p.total, p.payment_method, p.created_at, r.table_name
+             FROM payments p
+             JOIN payment_receipts r ON r.payment_id = p.id
+             WHERE p.created_at >= ? AND p.created_at < ?
+             ORDER BY p.created_at DESC, p.id DESC',
+            array($start, $end)
+        );
+    }
+
+    // Số việc đang chờ ở từng khu vực để hiển thị trên sidebar nhân viên.
+    public function sidebarNotifications()
+    {
+        $row = $this->one(
+            "SELECT
+                (SELECT COUNT(*) FROM service_sessions) AS tables,
+                (SELECT COUNT(*) FROM kitchen_tickets WHERE status = 'Chờ in') AS orders,
+                (SELECT COUNT(*) FROM kitchen_tickets
+                    WHERE status IN ('Chờ bếp', 'Đang nấu')) AS kitchen,
+                (SELECT COUNT(*) FROM orders o
+                    JOIN service_sessions s ON s.order_id = o.id
+                    WHERE o.status IN ('Đang phục vụ', 'Chờ thanh toán')
+                      AND EXISTS (SELECT 1 FROM kitchen_tickets k WHERE k.order_id = o.id)
+                      AND NOT EXISTS (SELECT 1 FROM kitchen_tickets k
+                          WHERE k.order_id = o.id
+                            AND k.status NOT IN ('Chờ kiểm món', 'Đã kiểm đủ', 'Đã phục vụ'))
+                      AND NOT EXISTS (SELECT 1 FROM kitchen_tickets k
+                          JOIN kitchen_ticket_items i ON i.ticket_id = k.id
+                          WHERE k.order_id = o.id
+                            AND (i.item_ready_at IS NULL OR i.item_served_at IS NULL))) AS payments"
+        );
+
+        return array(
+            'tables' => (int) $row['tables'],
+            'orders' => (int) $row['orders'],
+            'kitchen' => (int) $row['kitchen'],
+            'payments' => (int) $row['payments']
+        );
     }
 
     // Mọi thay đổi một bàn đều khóa cùng dòng bàn trước khi xử lý.
@@ -134,7 +187,7 @@ class Restaurant
         return $orderId;
     }
 
-    public function addTicket($orderId, $quantities, $requestKey, $notes = array())
+    public function addTicket($orderId, $draftItems, $requestKey)
     {
         $order = $this->lockOrder($orderId);
         if (!is_string($requestKey) || !preg_match('/^[a-f0-9]{32}$/', $requestKey)) {
@@ -150,25 +203,30 @@ class Restaurant
         if ($order['status'] !== 'Đang phục vụ') {
             throw new DomainException('Bàn đang chờ thanh toán. Chọn tiếp tục gọi món trước.');
         }
-        if (!is_array($quantities) || count($quantities) > 200 || !is_array($notes)) {
+        if (!is_array($draftItems) || count($draftItems) > 200) {
             throw new DomainException('Danh sách món không hợp lệ.');
         }
         $items = array();
-        foreach ($quantities as $id => $value) {
-            $quantity = filter_var($value, FILTER_VALIDATE_INT);
-            if ($quantity === false || $quantity < 0 || $quantity > 99) {
-                throw new DomainException('Số lượng mỗi món phải từ 0 đến 99.');
+        foreach ($draftItems as $draftItem) {
+            if (!is_array($draftItem) ||
+                !array_key_exists('product_id', $draftItem) ||
+                !array_key_exists('quantity', $draftItem) ||
+                !array_key_exists('note', $draftItem)) {
+                throw new DomainException('Dòng món không hợp lệ.');
             }
-            if ($quantity === 0) {
-                continue;
+            $productId = soNguyenDuong($draftItem['product_id']);
+            $quantity = filter_var($draftItem['quantity'], FILTER_VALIDATE_INT);
+            if ($quantity === false || $quantity < 1 || $quantity > 99) {
+                throw new DomainException('Số lượng mỗi dòng món phải từ 1 đến 99.');
             }
+            $note = ghiChuMon($draftItem['note']);
             $product = $this->one("SELECT * FROM products WHERE id = ?
-                                   AND status = 'Đang bán' AND price >= 0 FOR UPDATE", array(soNguyenDuong($id)));
+                                   AND status = 'Đang bán' AND price >= 0 FOR UPDATE", array($productId));
             if (!$product) {
                 throw new DomainException('Có món đã ngừng bán. Hãy tải lại thực đơn.');
             }
             $product['quantity'] = $quantity;
-            $product['note'] = ghiChuMon($notes[$id] ?? '');
+            $product['note'] = $note;
             $items[] = $product;
         }
         if (count($items) === 0) {
@@ -191,6 +249,9 @@ class Restaurant
 
     public function moveTicket($ticketId, $action, $checked)
     {
+        if ($action === 'check' || $action === 'serve') {
+            throw new DomainException('Hãy xác nhận đã mang từng món ra bàn, không xác nhận gộp cả phiếu.');
+        }
         $ticket = $this->one('SELECT * FROM kitchen_tickets WHERE id = ?', array($ticketId));
         if (!$ticket) {
             throw new DomainException('Không tìm thấy phiếu.');
@@ -207,22 +268,12 @@ class Restaurant
                 $from = 'Chờ bếp'; $to = 'Đang nấu'; $column = 'accepted_at';
                 break;
             case 'ready':
-                $from = 'Đang nấu'; $to = 'Chờ kiểm món'; $column = 'ready_at';
-                break;
-            case 'check':
-                $from = 'Chờ kiểm món'; $to = 'Đã kiểm đủ'; $column = 'checked_at';
-                $expected = array_column($this->ticketItems($ticketId), 'id');
-                if (!is_array($checked) || count($checked) !== count($expected)) {
-                    throw new DomainException('Hãy kiểm đủ tất cả món trên phiếu.');
-                }
-                foreach ($expected as $id) {
-                    if (!in_array((string) $id, $checked, true)) {
-                        throw new DomainException('Danh sách món đã kiểm không khớp phiếu.');
+                foreach ($this->ticketItems($ticketId) as $item) {
+                    if (!$item['item_ready_at'] || !$item['item_served_at']) {
+                        throw new DomainException('Còn món chưa nấu xong. Hãy tích từng món trước khi giao phiếu.');
                     }
                 }
-                break;
-            case 'serve':
-                $from = 'Đã kiểm đủ'; $to = 'Đã phục vụ'; $column = 'served_at';
+                $from = 'Đang nấu'; $to = 'Chờ kiểm món'; $column = 'ready_at';
                 break;
             default:
                 throw new DomainException('Thao tác không hợp lệ.');
@@ -238,6 +289,58 @@ class Restaurant
         return $ticket['order_id'];
     }
 
+    // Controller đã mở transaction. Khóa cùng bàn/phiếu để hai người không ghi chồng.
+    public function markTicketItem($ticketId, $detailId, $action)
+    {
+        if ($action !== 'item-ready') {
+            throw new DomainException('Thao tác món không hợp lệ.');
+        }
+        $ticket = $this->one('SELECT * FROM kitchen_tickets WHERE id = ?', array($ticketId));
+        if (!$ticket) {
+            throw new DomainException('Không tìm thấy phiếu.');
+        }
+        $this->lockOrder($ticket['order_id']);
+        $ticket = $this->one('SELECT * FROM kitchen_tickets WHERE id = ? FOR UPDATE', array($ticketId));
+        $item = $this->one('SELECT * FROM kitchen_ticket_items WHERE ticket_id = ? AND detail_id = ? FOR UPDATE', array($ticketId, $detailId));
+        if (!$item) {
+            throw new DomainException('Món không thuộc phiếu đang chọn.');
+        }
+        if ($item['item_ready_at'] && $item['item_served_at']) {
+            return $ticket['order_id'];
+        }
+        if (!in_array($ticket['status'], array('Đang nấu', 'Chờ kiểm món', 'Đã kiểm đủ'), true)) {
+            throw new DomainException('Bếp phải nhận phiếu trước khi xác nhận món.');
+        }
+        // Một lần lưu xác nhận cả nấu xong và mang ra bàn.
+        $this->query('UPDATE kitchen_ticket_items
+                      SET item_ready_at = COALESCE(item_ready_at, NOW()),
+                          item_served_at = COALESCE(item_served_at, NOW())
+                      WHERE id = ?', array($item['id']));
+        return $ticket['order_id'];
+    }
+
+    // Tự hoàn tất phiếu khi tất cả dòng món đã được xác nhận tại bếp.
+    public function finishServedTicket($ticketId)
+    {
+        $ticket = $this->one('SELECT status FROM kitchen_tickets WHERE id = ?', array($ticketId));
+        if (!in_array($ticket['status'], array('Đang nấu', 'Chờ kiểm món', 'Đã kiểm đủ'), true)) {
+            return;
+        }
+        $items = $this->ticketItems($ticketId);
+        if (!$items) {
+            return;
+        }
+        foreach ($items as $item) {
+            if (!$item['item_ready_at'] || !$item['item_served_at']) {
+                return;
+            }
+        }
+        $this->query("UPDATE kitchen_tickets SET status = 'Đã phục vụ',
+                      ready_at = COALESCE(ready_at, NOW()),
+                      checked_at = COALESCE(checked_at, NOW()), served_at = NOW()
+                      WHERE id = ?", array($ticketId));
+    }
+
     public function ensureServed($orderId)
     {
         $tickets = $this->tickets($orderId);
@@ -245,8 +348,13 @@ class Restaurant
             throw new DomainException('Chưa có món để thanh toán.');
         }
         foreach ($tickets as $ticket) {
-            if ($ticket['status'] !== 'Đã phục vụ') {
+            if (!in_array($ticket['status'], array('Chờ kiểm món', 'Đã kiểm đủ', 'Đã phục vụ'), true)) {
                 throw new DomainException('Phải kiểm đủ món và phục vụ tất cả phiếu trước khi thanh toán.');
+            }
+            foreach ($this->ticketItems($ticket['id']) as $item) {
+                if (!$item['item_ready_at'] || !$item['item_served_at']) {
+                    throw new DomainException('Còn món chưa xác nhận đã mang ra bàn.');
+                }
             }
         }
     }
@@ -291,8 +399,8 @@ class Restaurant
             return $old['payment_id'];
         }
         $order = $this->lockOrder($orderId);
-        if ($order['status'] !== 'Chờ thanh toán') {
-            throw new DomainException('Hãy chuyển bàn sang chờ thanh toán trước.');
+        if (!in_array($order['status'], array('Đang phục vụ', 'Chờ thanh toán'), true)) {
+            throw new DomainException('Order không còn có thể thanh toán.');
         }
         $this->ensureServed($orderId);
         if (!in_array($method, array('Tiền mặt', 'Chuyển khoản', 'Thẻ'), true)) {
@@ -308,7 +416,8 @@ class Restaurant
         $this->query('INSERT INTO payment_receipts(payment_id, order_id, table_name, staff_name, items_json)
                       VALUES (?, ?, ?, ?, ?)', array($paymentId, $orderId, $table['name'], $staffName, json_encode($this->orderItems($orderId), JSON_UNESCAPED_UNICODE)));
         $this->query("UPDATE orders SET total = ?, status = 'Đã thanh toán' WHERE id = ?", array($total, $orderId));
-        $this->query("UPDATE tables SET status = 'Chờ in hóa đơn' WHERE id = ?", array($order['table_id']));
+        // Thanh toán xong là kết thúc lượt phục vụ; in lại không giữ bàn.
+        $this->finishReceipt($paymentId);
         return $paymentId;
     }
 

@@ -12,33 +12,37 @@ class AdminModel extends Restaurant
         $start = $day->format('Y-m-d') . ' 00:00:00';
         $end = $day->modify('+1 day')->format('Y-m-d') . ' 00:00:00';
 
-        $orders = $this->one(
-            'SELECT COUNT(*) AS value FROM orders
-             WHERE created_at >= ? AND created_at < ?',
+        // Doanh thu thuộc ngày tạo order, kể cả khách thanh toán vào ngày hôm sau.
+        $invoices = $this->one(
+            'SELECT COUNT(*) AS value
+             FROM payments p JOIN orders o ON o.id = p.order_id
+             WHERE o.created_at >= ? AND o.created_at < ?',
             array($start, $end)
         );
         $revenue = $this->one(
-            "SELECT COALESCE(SUM(total), 0) AS value,
-                    COALESCE(SUM(CASE WHEN payment_method = 'Tiền mặt' THEN total ELSE 0 END), 0) AS cash,
-                    COALESCE(SUM(CASE WHEN payment_method = 'Chuyển khoản' THEN total ELSE 0 END), 0) AS transfer,
-                    COALESCE(SUM(CASE WHEN payment_method = 'Thẻ' THEN total ELSE 0 END), 0) AS card,
-                    COALESCE(SUM(CASE WHEN payment_method IS NULL OR payment_method NOT IN ('Tiền mặt', 'Chuyển khoản', 'Thẻ') THEN total ELSE 0 END), 0) AS other
-             FROM payments
-             WHERE created_at >= ? AND created_at < ?",
+            "SELECT COALESCE(SUM(p.total), 0) AS value,
+                    COALESCE(SUM(CASE WHEN p.payment_method = 'Tiền mặt' THEN p.total ELSE 0 END), 0) AS cash,
+                    COALESCE(SUM(CASE WHEN p.payment_method = 'Chuyển khoản' THEN p.total ELSE 0 END), 0) AS transfer,
+                    COALESCE(SUM(CASE WHEN p.payment_method = 'Thẻ' THEN p.total ELSE 0 END), 0) AS card,
+                    COALESCE(SUM(CASE WHEN p.payment_method IS NULL OR p.payment_method NOT IN ('Tiền mặt', 'Chuyển khoản', 'Thẻ') THEN p.total ELSE 0 END), 0) AS other
+             FROM payments p JOIN orders o ON o.id = p.order_id
+             WHERE o.created_at >= ? AND o.created_at < ?",
             array($start, $end)
         );
         $tables = $this->one('SELECT COUNT(*) AS value FROM service_sessions');
-        $dayOrders = $this->all(
-            'SELECT o.*, t.name AS table_name, u.name AS staff_name
-             FROM orders o
-             LEFT JOIN tables t ON t.id = o.table_id
-             LEFT JOIN users u ON u.id = o.user_id
+        $dayInvoices = $this->all(
+            'SELECT p.id, p.order_id, p.total, p.payment_method,
+                    p.created_at AS paid_at, o.created_at AS order_created_at,
+                    r.table_name, r.staff_name
+             FROM payments p
+             JOIN orders o ON o.id = p.order_id
+             JOIN payment_receipts r ON r.payment_id = p.id
              WHERE o.created_at >= ? AND o.created_at < ?
-             ORDER BY o.created_at DESC, o.id DESC',
+             ORDER BY o.created_at DESC, p.id DESC',
             array($start, $end)
         );
         return array(
-            'orders' => $orders['value'],
+            'invoices' => $invoices['value'],
             'revenue' => $revenue['value'],
             'cash' => $revenue['cash'],
             'transfer' => $revenue['transfer'],
@@ -46,7 +50,7 @@ class AdminModel extends Restaurant
             'other' => $revenue['other'],
             'date' => $date,
             'tables' => $tables['value'],
-            'day_orders' => $dayOrders
+            'day_invoices' => $dayInvoices
         );
     }
 

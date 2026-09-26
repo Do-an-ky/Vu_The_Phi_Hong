@@ -6,21 +6,32 @@ $ticket = $model->one('SELECT k.*, t.name AS table_name FROM kitchen_tickets k
 if (!$ticket) {
     throw new DomainException('Không tìm thấy phiếu.');
 }
-$items = $model->ticketItems($id);
+// In lại từ theo dõi: lấy tất cả món của cùng lượt khách, không đổi trạng thái.
+$printWholeTable = ($_GET['scope'] ?? '') === 'table';
+$items = array();
+if ($printWholeTable) {
+    foreach ($model->tickets($ticket['order_id']) as $part) {
+        foreach ($model->ticketItems($part['id']) as $item) {
+            $items[] = $item;
+        }
+    }
+} else {
+    $items = $model->ticketItems($id);
+}
 ?>
 <div class="page-heading no-print">
-    <h1>In phiếu order</h1>
+    <h1><?php echo $printWholeTable ? 'In lại toàn bộ món của bàn' : 'In phiếu order'; ?></h1>
     <button type="button" class="button primary" data-print>In phiếu</button>
 </div>
 <section class="invoice">
     <div class="invoice-heading">
-        <h2>HỒNG RESTAURANT</h2>
-        <h2>PHIẾU ORDER #<?php echo $id; ?></h2>
+        <h2>RESTAURANT</h2>
+        <h2>Phiếu bếp – <?php echo e($ticket['table_name']); ?></h2>
         <p><?php echo e($ticket['table_name']); ?> · Order #<?php echo $ticket['order_id']; ?></p>
         <p><?php echo e($ticket['created_at']); ?></p>
     </div>
     <table class="data-table">
-        <thead><tr><th>Món cần chế biến</th><th>Số lượng</th></tr></thead>
+        <thead><tr><th><?php echo $printWholeTable ? 'Món đã gọi' : 'Món cần chế biến'; ?></th><th>Số lượng</th></tr></thead>
         <tbody>
             <?php foreach ($items as $item): ?>
                 <tr>
@@ -35,10 +46,12 @@ $items = $model->ticketItems($id);
             <?php endforeach; ?>
         </tbody>
     </table>
-    <p class="hint">Bếp gửi món kèm phiếu cho nhân viên kiểm tra.</p>
+    <p class="hint"><?php echo $printWholeTable ? 'Bản in lại toàn bộ món của lượt khách này, gồm các lần gọi bổ sung.' : 'Bếp gửi món kèm phiếu cho nhân viên kiểm tra.'; ?></p>
 </section>
 <div class="panel no-print section-title">
-    <?php if ($ticket['status'] === 'Chờ in'): ?>
+    <?php if ($printWholeTable): ?>
+        <p>In lại không gửi món xuống bếp và không thay đổi tiến độ phục vụ.</p>
+    <?php elseif ($ticket['status'] === 'Chờ in'): ?>
         <p>Sau khi in thành công, xác nhận bên dưới để bếp nhận phiếu. Hủy hộp thoại in sẽ không tự chuyển trạng thái.</p>
         <form method="post">
             <?php csrfInput(); ?>

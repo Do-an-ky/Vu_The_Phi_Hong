@@ -1,5 +1,5 @@
 <section class="panel login-panel">
-    <p class="eyebrow">HỒNG RESTAURANT</p>
+    <p class="eyebrow">RESTAURANT</p>
     <h1>Đăng nhập nhân viên</h1>
     <p>Dùng tài khoản nhân viên trong hệ thống nhà hàng.</p>
     <form method="post" action="?page=login">

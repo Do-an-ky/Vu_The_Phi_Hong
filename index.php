@@ -26,12 +26,13 @@ try {
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Đăng nhập | HỒNG Restaurant</title>
-    <link rel="stylesheet" href="public/css/admin.css?v=1">
+    <title>Đăng nhập | RESTAURANT</title>
+    <link rel="stylesheet" href="public/css/admin.css?v=<?php echo filemtime(__DIR__ . '/public/css/admin.css'); ?>">
+    <link rel="stylesheet" href="public/css/ui-refresh.css?v=<?php echo filemtime(__DIR__ . '/public/css/ui-refresh.css'); ?>">
 </head>
 <body class="login-screen">
     <main class="login-card">
-        <div class="login-brand"><span class="brand-mark">H.</span> RESTAURANT</div>
+        <div class="login-brand">RESTAURANT</div>
         <p class="eyebrow">CHÀO MỪNG TRỞ LẠI</p>
         <h1>Đăng nhập</h1>
         <p class="muted">Sử dụng tài khoản được cấp để vào hệ thống.</p>
