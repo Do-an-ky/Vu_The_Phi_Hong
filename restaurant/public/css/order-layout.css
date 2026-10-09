@@ -1,0 +1,562 @@
+/* Chỉ sửa bố cục trang gọi món. Không đổi sidebar điều hướng chính. */
+/* Giá và thành tiền trong hộp thoại chọn món. */
+#dish-modal #dish-modal-price {
+    margin: 20px 0;
+    padding: 18px 20px;
+    border: 1px solid #9a9d9c;
+    border-radius: 12px;
+    color: black;
+    font-size: 22px;
+    font-weight: 700;
+    line-height: 1.6;
+    white-space: pre-line;
+    overflow-wrap: anywhere;
+}
+
+/* Bố cục trang gọi món và chiều rộng thanh điều hướng trên máy tính. */
+@media screen {
+    #menu-form .order-layout {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) clamp(320px, 27vw, 420px);
+        gap: 28px;
+        align-items: start;
+    }
+
+    #menu-form .menu-workspace {
+        display: grid;
+        grid-template-columns: 200px minmax(0, 1fr);
+        gap: 24px;
+        align-items: start;
+    }
+
+    #menu-form .order-layout>*,
+    #menu-form .menu-workspace>*,
+    #menu-form .menu-grid>* {
+        min-width: 0;
+        max-width: 100%;
+        box-sizing: border-box;
+    }
+
+    /* Sidebar danh mục dài theo chiều dọc, các nút đủ lớn để bấm. */
+    #menu-form .category-sidebar {
+        position: sticky;
+        top: 24px;
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        height: min(680px, calc(100dvh - 48px));
+        min-height: 0;
+        padding: 20px 14px;
+        margin: 0;
+        gap: 10px;
+        overflow-y: auto;
+        overflow-x: hidden;
+        scrollbar-gutter: stable;
+    }
+
+    #menu-form .category-sidebar-title {
+        display: block;
+        margin: 4px 8px 12px;
+        flex-shrink: 0;
+    }
+
+    #menu-form .category-button {
+        width: 100%;
+        min-width: 0;
+        min-height: 64px;
+        padding: 14px 12px;
+        margin: 0;
+        gap: 10px;
+        flex-shrink: 0;
+        font-size: 16px;
+        white-space: normal;
+    }
+
+    #menu-form .category-button span {
+        min-width: 0;
+        white-space: normal;
+        overflow: visible;
+        overflow-wrap: anywhere;
+        text-overflow: clip;
+    }
+
+    #menu-form .menu-content .search {
+        width: 100%;
+        margin-bottom: 22px;
+    }
+
+    /* Số cột phụ thuộc vùng trống thực tế, không ép thẻ tràn sang phiếu. */
+    #menu-form .menu-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(min(100%, 190px), 1fr));
+        gap: 20px;
+    }
+
+    #menu-form .menu-item {
+        width: auto;
+        min-width: 0;
+        min-height: 220px;
+        padding: 22px;
+        overflow-wrap: anywhere;
+    }
+
+    #menu-form .dish-action {
+        white-space: normal;
+    }
+
+    /* Chỉ danh sách cuộn; tổng tiền và nút xác nhận có hàng riêng. */
+    #menu-form .order-layout>.ticket {
+        position: sticky;
+        top: 24px;
+        display: grid;
+        grid-template-rows: auto auto minmax(0, 1fr) auto auto;
+        gap: 16px;
+        width: 100%;
+        height: min(680px, calc(100dvh - 48px));
+        min-height: 0;
+        max-height: none;
+        margin: 0;
+        padding: 28px;
+        overflow: hidden;
+    }
+
+    #menu-form .ticket::before {
+        position: absolute;
+        top: 0;
+        left: 28px;
+        margin: 0;
+        width: 64px;
+        height: 5px;
+    }
+
+    #menu-form .ticket>.eyebrow,
+    #menu-form .ticket>h2 {
+        min-width: 0;
+        margin: 0;
+        overflow-wrap: anywhere;
+    }
+
+    #menu-form #cart-summary {
+        min-width: 0;
+        min-height: 0;
+        max-height: none;
+        margin: 0;
+        padding: 4px 8px 4px 0;
+        overflow-y: auto;
+        overflow-x: hidden;
+        overscroll-behavior: contain;
+        scrollbar-gutter: stable;
+    }
+
+    #menu-form #cart-summary .cart-row {
+        width: 100%;
+        min-width: 0;
+        margin: 0 0 14px;
+        padding: 16px;
+    }
+
+    #menu-form .cart-item-head {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 8px 14px;
+    }
+
+    #menu-form #cart-summary .cart-item-name {
+        min-width: 0;
+        flex: 1 1 140px;
+        margin: 0;
+        overflow-wrap: anywhere;
+    }
+
+    #menu-form .cart-item-amount {
+        flex: 0 0 auto;
+    }
+
+    #menu-form .cart-item-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 14px;
+    }
+
+    #menu-form #cart-summary .cart-item-actions .button {
+        min-height: 42px;
+        margin: 0;
+        flex: 1 1 70px;
+    }
+
+    #menu-form .ticket>.ticket-total {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: baseline;
+        gap: 10px 16px;
+        margin: 0;
+        padding-top: 18px;
+    }
+
+    #menu-form .ticket>.button.primary {
+        width: 100%;
+        min-height: 52px;
+        margin: 0;
+        white-space: normal;
+    }
+}
+
+@media screen and (max-width: 1400px) {
+    #menu-form .order-layout {
+        grid-template-columns: minmax(0, 1fr) 340px;
+        gap: 22px;
+    }
+
+    #menu-form .menu-workspace {
+        grid-template-columns: 170px minmax(0, 1fr);
+        gap: 18px;
+    }
+}
+
+@media screen and (max-width: 1150px) {
+    #menu-form .order-layout {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    #menu-form .order-layout>.ticket {
+        position: static;
+        height: 560px;
+    }
+}
+
+@media screen and (max-width: 640px) {
+    #menu-form .menu-workspace {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    #menu-form .category-sidebar {
+        position: static;
+        height: auto;
+        max-height: 300px;
+        padding: 16px;
+    }
+
+    #menu-form .order-layout>.ticket {
+        height: 540px;
+        padding: 22px;
+    }
+}
+
+/* Cửa sổ thấp: cho trang cuộn tự nhiên để mọi nút luôn có thể truy cập. */
+@media screen and (max-height: 650px) {
+    #menu-form .category-sidebar {
+        position: static;
+        height: auto;
+        min-height: 360px;
+    }
+
+    #menu-form .order-layout>.ticket {
+        position: static;
+        height: auto;
+        grid-template-rows: auto auto auto auto auto;
+    }
+
+    #menu-form #cart-summary {
+        min-height: 100px;
+        max-height: 280px;
+    }
+}
+
+/*
+ * Máy tính: trang gọi món có chiều cao đúng bằng cửa sổ.
+ * Header và tiêu đề chiếm hàng riêng; ba cột dùng phần chiều cao còn lại.
+ * Không dùng sticky nên đầu phiếu không thể chạy ra ngoài màn hình.
+ */
+@media screen and (min-width: 1000px) and (min-height: 650px) {
+
+    html:has(#menu-form),
+    body:has(#menu-form) {
+        height: 100%;
+        overflow: hidden;
+    }
+
+    body:has(#menu-form)>.workspace {
+        height: 100dvh;
+        min-height: 0;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
+
+    body:has(#menu-form) .workspace>header {
+        height: 64px;
+        min-height: 64px;
+        flex: 0 0 64px;
+    }
+
+    body:has(#menu-form) .workspace>main {
+        display: flex;
+        flex: 1 1 0;
+        flex-direction: column;
+        width: 100%;
+        min-width: 0;
+        min-height: 0;
+        max-width: none;
+        margin: 0;
+        padding: 20px 24px 24px;
+        overflow: hidden;
+    }
+
+    body:has(#menu-form) main>.page-heading {
+        flex: 0 0 auto;
+        min-height: 0;
+        margin: 0 0 20px;
+        gap: 16px;
+    }
+
+    body:has(#menu-form) .page-heading h1 {
+        font-size: 30px;
+        margin-bottom: 8px;
+    }
+
+    body:has(#menu-form) main>.notice {
+        flex: 0 0 auto;
+        margin-bottom: 12px;
+        padding: 10px 14px;
+    }
+
+    #menu-form {
+        display: flex;
+        flex-direction: column;
+        flex: 1 1 0;
+        min-height: 0;
+        min-width: 0;
+        margin: 0;
+    }
+
+    #menu-form .order-layout {
+        flex: 1 1 0;
+        min-height: 0;
+        height: 100%;
+        grid-template-columns: minmax(0, 1fr) clamp(300px, 25vw, 400px);
+        gap: 22px;
+        align-items: stretch;
+    }
+
+    #menu-form .menu-workspace {
+        height: 100%;
+        min-height: 0;
+        grid-template-columns: 180px minmax(0, 1fr);
+        gap: 20px;
+        align-items: stretch;
+    }
+
+    #menu-form .category-sidebar {
+        position: static;
+        height: 100%;
+        min-height: 0;
+        max-height: none;
+        margin: 0;
+        align-self: stretch;
+    }
+
+    #menu-form .menu-content {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        min-height: 0;
+        overflow: hidden;
+    }
+
+    #menu-form .menu-content .search {
+        height: 52px;
+        min-height: 52px;
+        margin-bottom: 16px;
+        flex: 0 0 auto;
+    }
+
+    /* Vùng thực đơn ở giữa cuộn độc lập với hai cột bên cạnh. */
+    #menu-form .menu-grid {
+        flex: 1 1 0;
+        min-height: 0;
+        overflow-y: auto;
+        overflow-x: hidden;
+        align-content: start;
+        padding: 2px 10px 16px 2px;
+        scrollbar-gutter: stable;
+        overscroll-behavior: contain;
+    }
+
+    #menu-form .menu-item {
+        min-height: 220px;
+        padding: 20px;
+    }
+
+    #menu-form .order-layout>.ticket {
+        position: relative;
+        top: auto;
+        height: 100%;
+        min-height: 0;
+        max-height: none;
+        padding: 24px;
+        margin: 0;
+        grid-template-rows: auto auto minmax(0, 1fr) auto auto;
+        gap: 14px;
+        align-self: stretch;
+        overflow: hidden;
+    }
+
+    #menu-form .ticket::before {
+        top: 0;
+        left: 24px;
+        margin: 0;
+    }
+
+    #menu-form .ticket>.eyebrow {
+        padding-top: 8px;
+    }
+
+    #menu-form .ticket>h2 {
+        line-height: 1.3;
+        font-size: 25px;
+    }
+
+    #menu-form #cart-summary {
+        min-height: 0;
+        max-height: none;
+        margin: 0;
+    }
+
+    #menu-form .ticket>.ticket-total {
+        padding-top: 14px;
+    }
+
+    #menu-form .ticket>.button.primary {
+        min-height: 48px;
+    }
+}
+
+@media screen and (min-width: 1600px) and (min-height: 650px) {
+    #menu-form .menu-workspace {
+        grid-template-columns: 210px minmax(0, 1fr);
+        gap: 24px;
+    }
+}
+
+/* Giữ tiêu đề, tổng tiền và nút xác nhận ngoài vùng cuộn của phiếu. */
+@media screen {
+    #menu-form .order-layout>.ticket {
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        padding-top: 32px;
+        overflow: visible;
+    }
+
+    #menu-form .ticket::before {
+        content: none;
+    }
+
+    #menu-form .ticket>.eyebrow,
+    #menu-form .ticket>h2,
+    #menu-form .ticket>.ticket-total,
+    #menu-form .ticket>.button.primary {
+        flex: 0 0 auto;
+        position: static;
+        transform: none;
+        margin: 0;
+    }
+
+    #menu-form .ticket>.eyebrow {
+        padding: 0;
+        line-height: 1.5;
+    }
+
+    #menu-form .ticket>h2 {
+        padding: 0 0 8px;
+        line-height: 1.4;
+    }
+
+    #menu-form .ticket>#cart-summary {
+        flex: 1 1 0;
+        min-height: 0;
+        overflow-y: auto;
+    }
+}
+
+/* Chuyển bớt chiều ngang của thanh chính sang danh mục món. */
+@media screen and (min-width: 901px) {
+    body>.sidebar {
+        width: 260px;
+        padding-inline: 18px;
+    }
+
+    body>.workspace {
+        margin-left: 260px;
+    }
+
+    #menu-form .menu-workspace {
+        grid-template-columns: 232px minmax(0, 1fr);
+    }
+}
+
+@media screen and (min-width: 901px) and (max-width: 1500px) {
+    body>.sidebar {
+        width: 238px;
+    }
+
+    body>.workspace {
+        margin-left: 238px;
+    }
+
+    #menu-form .menu-workspace {
+        grid-template-columns: 212px minmax(0, 1fr);
+    }
+}
+
+@media screen and (min-width: 901px) and (max-width: 1150px) {
+    body>.sidebar {
+        width: 218px;
+        padding-inline: 14px;
+    }
+
+    body>.workspace {
+        margin-left: 218px;
+    }
+}
+
+@media screen and (min-width: 1600px) {
+    #menu-form .menu-workspace {
+        grid-template-columns: 242px minmax(0, 1fr);
+    }
+}
+/* Tiêu đề phiếu và nút làm trống nằm ngoài vùng danh sách cuộn. */
+#menu-form .ticket > .draft-heading {
+    display: flex;
+    flex: 0 0 auto;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding-bottom: 8px;
+}
+
+#menu-form .draft-heading h2 {
+    margin: 0;
+    font-size: 25px;
+    line-height: 1.4;
+}
+
+#menu-form .draft-heading .clear-draft {
+    min-height: 40px;
+    padding: 8px 12px;
+    border: 1px solid #e5c8c3;
+    background: #fff7f5;
+    color: #a13d30;
+    font-size: 14px;
+    white-space: nowrap;
+    box-shadow: none;
+}
+
+#menu-form .draft-heading .clear-draft:disabled {
+    opacity: 0.45;
+    cursor: default;
+}
