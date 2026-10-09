@@ -7,7 +7,7 @@
                 <tbody>
                     <?php foreach ($rows as $row): ?>
                         <tr>
-                            <td><strong><?php echo e($row['name']); ?></strong><small>#<?php echo e($row['id']); ?> · <?php echo e($row['category'] ?? 'Chưa phân loại'); ?></small></td>
+                            <td><img class="product-list-image" src="<?php echo e($row['image'] ?: 'image/placeholder.svg'); ?>" alt="" loading="lazy"><strong><?php echo e($row['name']); ?></strong><small>#<?php echo e($row['id']); ?> · <?php echo e($row['category'] ?? 'Chưa phân loại'); ?></small></td>
                             <td class="money"><?php echo tien($row['price']); ?></td>
                             <td>
                                 <span class="badge <?php echo $row['status'] === 'Đang bán' ? 'available' : ''; ?>"><?php echo e($row['status']); ?></span>
@@ -42,9 +42,16 @@
             <p class="form-help">Bạn cần thêm danh mục trước khi thêm sản phẩm.</p>
             <a class="button primary" href="admin.php?page=categories#editor">Thêm danh mục</a>
         <?php else: ?>
-            <form method="post" class="editor-form">
+            <form method="post" class="editor-form" enctype="multipart/form-data">
                 <?php csrfInput(); ?>
                 <input type="hidden" name="id" value="<?php echo e($form['id']); ?>">
+                <label>Ảnh món ăn / đồ uống
+                    <input type="file" name="image" accept="image/jpeg,image/png,image/webp">
+                </label>
+                <p class="form-help">JPG, PNG hoặc WebP, tối đa 5 MB. Không chọn ảnh mới sẽ giữ ảnh hiện tại.</p>
+                <?php if (!empty($form['image'])): ?>
+                    <img class="product-editor-image" src="<?php echo e($form['image']); ?>" alt="Ảnh hiện tại">
+                <?php endif; ?>
                 <label>Tên sản phẩm<input name="name" maxlength="100" value="<?php echo e($form['name']); ?>" required></label>
                 <label>Danh mục
                     <select name="category_id" required>

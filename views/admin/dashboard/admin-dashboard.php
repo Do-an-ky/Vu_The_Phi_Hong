@@ -59,12 +59,12 @@ if ((float) $stats['other'] !== 0.0) {
 
     <section class="dashboard-orders-panel">
         <div class="dashboard-section-heading">
-            <div><p class="eyebrow">THANH TOÁN TRONG NGÀY</p><h2>Hóa đơn ngày <?php echo e($displayDate); ?></h2></div>
+            <div><h2>Hóa đơn ngày <?php echo e($displayDate); ?></h2></div>
             <span class="dashboard-order-count"><?php echo e($stats['invoices']); ?> hóa đơn</span>
         </div>
         <div class="table-scroll">
             <table class="dashboard-orders-table">
-                <thead><tr><th>Hóa đơn</th><th>Order</th><th>Bàn</th><th>Nhân viên</th><th>Giờ tạo đơn</th><th>Thanh toán lúc</th><th>Phương thức</th><th class="money">Tổng tiền</th></tr></thead>
+                <thead><tr><th>Hóa đơn</th><th>Order</th><th>Bàn</th><th>Người tạo đơn</th><th>Giờ tạo đơn</th><th>Thanh toán lúc</th><th>Phương thức</th><th class="money">Tổng tiền</th></tr></thead>
                 <tbody>
                     <?php foreach ($stats['day_invoices'] as $order): ?>
                         <tr>
@@ -80,6 +80,33 @@ if ((float) $stats['other'] !== 0.0) {
                     <?php endforeach; ?>
                     <?php if (!$stats['day_invoices']): ?>
                         <tr><td colspan="8"><div class="dashboard-empty"><span>▤</span><strong>Chưa có hóa đơn</strong><p>Chưa có order của ngày này được thanh toán.</p></div></td></tr>
+                    <?php endif; ?>
+                </tbody>
+            </table>
+        </div>
+    </section>
+    <section class="dashboard-orders-panel">
+        <div class="dashboard-section-heading">
+            <div>
+                <h2>Món đã bán ngày <?php echo e($displayDate); ?></h2>
+            </div>
+            <span class="dashboard-order-count"><?php echo count($stats['sold_products']); ?> sản phẩm</span>
+        </div>
+        <div class="table-scroll">
+            <table class="dashboard-orders-table">
+                <thead>
+                    <tr><th>Sản phẩm</th><th>Số lượng đã bán</th><th class="money">Thành tiền</th></tr>
+                </thead>
+                <tbody>
+                    <?php foreach ($stats['sold_products'] as $product): ?>
+                        <tr>
+                            <td><strong><?php echo e($product['name']); ?></strong></td>
+                            <td><?php echo e($product['quantity']); ?></td>
+                            <td class="money"><strong><?php echo tien($product['total']); ?></strong></td>
+                        </tr>
+                    <?php endforeach; ?>
+                    <?php if (!$stats['sold_products']): ?>
+                        <tr><td colspan="3"><div class="dashboard-empty"><strong>Chưa có sản phẩm đã bán</strong><p>Chưa có món thuộc đơn đã thanh toán của ngày này.</p></div></td></tr>
                     <?php endif; ?>
                 </tbody>
             </table>

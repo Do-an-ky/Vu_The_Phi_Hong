@@ -924,3 +924,20 @@ input, select {
         max-width: 240px;
     }
 }
+
+.product-list-image {
+    float: left;
+    width: 54px;
+    height: 54px;
+    object-fit: cover;
+    border-radius: 8px;
+    margin: 0 12px 4px 0;
+}
+.product-editor-image {
+    display: block;
+    width: 100%;
+    max-width: 240px;
+    height: 160px;
+    object-fit: cover;
+    border-radius: 10px;
+}

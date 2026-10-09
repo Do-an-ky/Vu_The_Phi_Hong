@@ -5,20 +5,69 @@ if (!$order) {
     echo '<div class="panel"><h1>Chọn bàn trước khi gọi món</h1><p>Xếp khách vào bàn trống hoặc mở bàn đang phục vụ.</p><a class="button primary" href="?page=tables">Chọn bàn</a></div>';
     return;
 }
-if ($order['status'] !== 'Đang phục vụ') {
+if (!in_array($order['status'], array('Đang phục vụ', 'Chờ thanh toán'), true)) {
     echo '<div class="panel"><p>Bàn không ở trạng thái đang phục vụ.</p><a class="button" href="?page=order-detail&id=' . $id . '">Xem order / Tiếp tục gọi món</a></div>';
     return;
 }
 $products = $model->products();
+
 $requestKey = $orderDraft['request_key'] ?? '';
 $isReview = ($_POST['action'] ?? '') === 'review' && $errorMessage === '';
 $draftItems = $orderDraft['items'] ?? array();
+$editTicketId = (int) ($_GET['ticket_id'] ?? 0);
+$editVersion = '';
+if ($editTicketId > 0) {
+    $editTicket = $model->one('SELECT * FROM kitchen_tickets WHERE id = ?', array($editTicketId));
+    if (!$editTicket || (int) $editTicket['order_id'] !== $id || $editTicket['status'] !== 'Chờ in') {
+        throw new DomainException('Chỉ sửa món trong phiếu chưa chuyển bếp của bàn này.');
+    }
+    $editRows = $model->ticketItems($editTicketId);
+    $editVersion = hash('sha256', json_encode($editRows));
+    $draftItems = array();
+    $editableItems = $model->all(
+        'SELECT d.product_id, d.quantity, d.note
+         FROM order_details d
+         JOIN kitchen_ticket_items k ON k.detail_id = d.id
+         WHERE k.ticket_id = ? ORDER BY k.id',
+        array($editTicketId)
+    );
+    foreach ($editableItems as $editRow) {
+        $draftItems[] = array(
+            'product_id' => (int) $editRow['product_id'],
+            'quantity' => (int) $editRow['quantity'],
+            'note' => $editRow['note']
+        );
+    }
+}
 if (!$isReview && ($_POST['action'] ?? '') === 'edit' && $errorMessage === '') {
     $draftItems = docMonTuForm(
         $_POST['product_id'] ?? array(),
         $_POST['quantity'] ?? array(),
         $_POST['note'] ?? array()
     );
+}
+// Mỗi lần mở form có mã riêng để gửi lặp không tạo thêm phiếu.
+$directForms = $_SESSION['direct_order_forms'] ?? array();
+foreach ($directForms as $key => $savedForm) {
+    if ($savedForm['created_at'] < time() - 7200) {
+        unset($directForms[$key]);
+    }
+}
+if (count($directForms) >= 30) {
+    array_shift($directForms);
+}
+$directKey = bin2hex(random_bytes(16));
+$directForms[$directKey] = array('order_id' => $id, 'created_at' => time());
+$_SESSION['direct_order_forms'] = $directForms;
+if (in_array($_POST['action'] ?? '', array('confirm-direct', 'update-ticket'), true) && $errorMessage !== '') {
+    if ($editTicketId > 0 && is_string($_POST['version'] ?? null)) {
+        $editVersion = $_POST['version'];
+    }
+    try {
+        $draftItems = docMonTuForm($_POST['product_id'] ?? array(), $_POST['quantity'] ?? array(), $_POST['note'] ?? array());
+    } catch (DomainException $error) {
+        $draftItems = array();
+    }
 }
 $items = array();
 $total = 0;
@@ -44,7 +93,9 @@ foreach ($draftItems as $draftItem) {
         <h1><?php echo e($order['table_name']); ?> · Gọi món</h1>
         <p>Mỗi lần xác nhận tạo một phiếu riêng. Món đã xác nhận không sửa tại đây.</p>
     </div>
-    <a class="button" href="?page=order-detail&id=<?php echo $id; ?>">Theo dõi order</a>
+    <?php if (!$isReview): ?>
+        <a class="button" href="?page=order-detail&id=<?php echo $id; ?>">Theo dõi phục vụ</a>
+    <?php endif; ?>
 </div>
 <?php if ($isReview && count($items) > 0): ?>
     <section class="panel">
@@ -70,12 +121,17 @@ foreach ($draftItems as $draftItem) {
 <?php else: ?>
     <?php if ($isReview): ?><div class="notice error">Hãy chọn ít nhất một món.</div><?php endif; ?>
     <form method="post" id="menu-form">
+        <input type="hidden" name="request_key" value="<?php echo e($directKey); ?>">
+        <?php if ($editTicketId > 0): ?>
+            <input type="hidden" name="ticket_id" value="<?php echo $editTicketId; ?>">
+            <input type="hidden" name="version" value="<?php echo e($editVersion); ?>">
+        <?php endif; ?>
         <?php csrfInput(); ?>
         <input type="hidden" name="order_id" value="<?php echo $id; ?>">
         <div class="order-layout">
             <section class="menu-workspace">
-                <aside class="category-sidebar" aria-label="Danh mục món">
-                    <p class="category-sidebar-title">DANH MỤC MÓN</p>
+                <nav class="category-menu" aria-label="Danh mục món">
+
                     <button type="button" class="category-button active" data-category="">
                         <span>Tất cả món</span>
                         <strong><?php echo count($products); ?></strong>
@@ -94,20 +150,22 @@ foreach ($draftItems as $draftItem) {
                             <strong><?php echo $categoryCount; ?></strong>
                         </button>
                     <?php endforeach; ?>
-                </aside>
+                </nav>
 
                 <div class="menu-content">
                     <input id="search" class="search" type="search" placeholder="Tìm món…" aria-label="Tìm món">
                     <div class="menu-grid">
                         <?php foreach ($products as $product): ?>
                             <article class="menu-item" data-id="<?php echo $product['id']; ?>" data-name="<?php echo e($product['name']); ?>" data-category="<?php echo e($product['category'] ?? 'Chưa phân loại'); ?>" data-price="<?php echo e($product['price']); ?>">
-                                <p class="food-category"><?php echo e($product['category']); ?></p>
+                                <?php $imageFile = $product['image'] ?: 'image/placeholder.svg'; ?>
+                                <button type="button" class="dish-photo" data-edit-dish aria-label="Chọn <?php echo e($product['name']); ?>">
+                                    <img src="<?php echo e($imageFile); ?>" alt="<?php echo e($product['name']); ?>" loading="lazy" width="480" height="320">
+                                    <strong class="dish-price"><?php echo tien($product['price']); ?></strong>
+                                </button>
                                 <h3><?php echo e($product['name']); ?></h3>
-                                <strong><?php echo tien($product['price']); ?></strong>
                                 <button type="button" class="button dish-action" data-edit-dish>
                                     <span>＋</span> Thêm vào phiếu
                                 </button>
-                                <p class="dish-selection muted"></p>
                             </article>
                         <?php endforeach; ?>
                     </div>
@@ -116,14 +174,13 @@ foreach ($draftItems as $draftItem) {
                 </div>
             </section>
             <aside class="ticket">
-                <p class="eyebrow">PHIẾU MỚI / BỔ SUNG</p>
-                <div class="draft-heading">
-                    <h2>Món đang chọn</h2>
-                    <button type="button" class="button clear-draft" id="clear-draft" disabled>Làm trống</button>
-                </div>
+                
                 <div id="cart-summary"><p>Chọn số lượng ở thực đơn bên cạnh.</p></div>
                 <div class="ticket-total"><span>Tạm tính</span><strong id="draft-total">0 đ</strong></div>
-                <button class="button primary full" name="action" value="review">Kiểm tra & xác nhận →</button>
+                <div class="draft-footer-actions">
+                    <button class="button primary" name="action" value="<?php echo $editTicketId > 0 ? 'update-ticket' : 'confirm-direct'; ?>"><?php echo $editTicketId > 0 ? 'Lưu sửa món & xem phiếu' : 'Xác nhận món & tạo phiếu'; ?></button>
+                    <button type="button" class="button clear-draft" id="clear-draft" disabled>Làm trống</button>
+                </div>
             </aside>
         </div>
         <div id="draft-fields"></div>

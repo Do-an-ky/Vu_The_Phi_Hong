@@ -1,0 +1,52 @@
+/* Chỉ nạp trong khung xem hóa đơn: giữ nguyên dữ liệu và mẫu in. */
+body.staff-shell {
+    display: block;
+    min-width: 0;
+    background: #ffffff;
+}
+body.staff-shell > .sidebar,
+body.staff-shell .workspace > header,
+body.staff-shell .no-print {
+    display: none;
+}
+body.staff-shell > .workspace {
+    margin: 0;
+    width: 100%;
+    min-width: 0;
+}
+body.staff-shell .workspace > main {
+    width: 100%;
+    max-width: none;
+    margin: 0;
+    padding: 16px;
+}
+body.staff-shell .invoice {
+    width: 100%;
+    margin: 0;
+    padding: 10px;
+    border: 0;
+    box-shadow: none;
+    border-radius: 0;
+}
+body.staff-shell .invoice-heading h2 {
+    font-size: 19px;
+}
+body.staff-shell .invoice p,
+body.staff-shell .invoice table {
+    font-size: 13px;
+}
+body.staff-shell .invoice th,
+body.staff-shell .invoice td {
+    padding: 10px 6px;
+    overflow-wrap: anywhere;
+}
+body.staff-shell .invoice .ticket-total {
+    flex-wrap: wrap;
+    gap: 12px;
+}
+body.staff-shell .invoice .ticket-total strong {
+    font-size: 25px;
+}
+html, body {
+    overscroll-behavior-y: contain;
+}

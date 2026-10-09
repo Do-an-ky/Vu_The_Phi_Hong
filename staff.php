@@ -117,6 +117,7 @@ try {
 <!DOCTYPE html>
 <html lang="vi">
     <head>
+    <link rel="icon" type="image/svg+xml" href="public/favicon.svg?v=1">
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <title><?php echo e($title); ?> | RESTAURANT</title>
@@ -126,8 +127,18 @@ try {
         <script defer src="public/js/script.js?v=<?php echo filemtime(__DIR__ . '/public/js/script.js'); ?>"></script>
         <link rel="stylesheet" href="public/css/ui-refresh.css?v=<?php echo filemtime(__DIR__ . '/public/css/ui-refresh.css'); ?>">
         <link rel="stylesheet" href="public/css/staff-design.css?v=<?php echo filemtime(__DIR__ . '/public/css/staff-design.css'); ?>">
-    </head>
-    <body class="staff-shell <?php if ($page === 'tables') echo 'staff-tables-page'; ?>">
+            <?php if ($page === 'payments'): ?>
+            <link rel="stylesheet" href="public/css/payment-design.css?v=<?php echo filemtime(__DIR__ . '/public/css/payment-design.css'); ?>">
+        <?php endif; ?>
+        <?php if ($page === 'payments'): ?>
+            <link rel="stylesheet" href="public/css/payment-preview.css?v=<?php echo filemtime(__DIR__ . '/public/css/payment-preview.css'); ?>">
+            <script src="public/js/payment-preview.js?v=<?php echo filemtime(__DIR__ . '/public/js/payment-preview.js'); ?>" defer></script>
+        <?php elseif ($page === 'invoice' && ($_GET['embed'] ?? '') === '1'): ?>
+            <link rel="stylesheet" href="public/css/invoice-embed.css?v=<?php echo filemtime(__DIR__ . '/public/css/invoice-embed.css'); ?>">
+        <?php endif; ?>
+<script src="public/js/clock.js?v=<?php echo filemtime(__DIR__ . '/public/js/clock.js'); ?>" defer></script>
+</head>
+    <body class="staff-shell <?php if ($page === 'tables') echo 'staff-tables-page'; elseif ($page === 'kitchen') echo 'staff-kitchen-page'; elseif ($page === 'payments') echo 'staff-payments-page'; ?>">
         <aside class="sidebar no-print">
             <a class="brand" href="?page=tables">RESTAURANT</a>
             <div class="nav-label">KHÔNG GIAN NHÂN VIÊN</div>
@@ -137,7 +148,7 @@ try {
                         <a class="admin-return-link" href="admin.php">← Quay lại trang quản trị</a>
                     <?php endif; ?>
                     <a href="?page=tables" data-notification-link="tables" class="<?php if ($page === 'tables') echo 'active'; ?>">
-                        <span class="nav-text">▦ Quản lý bàn</span>
+                        <span class="nav-text">▦ Sơ đồ bàn</span>
                         <span class="nav-badge" data-notification="tables" <?php if ($sidebarCounts['tables'] === 0) echo 'hidden'; ?>><?php echo $sidebarCounts['tables']; ?></span>
                     </a>
                     <a href="?page=orders" data-notification-link="orders" class="<?php if ($page === 'orders') echo 'active'; ?>">
@@ -166,7 +177,7 @@ try {
             <header class="no-print">
                 <span>Nhà hàng / <?php echo e($title); ?></span>
                 <div class="staff-header-profile">
-                    <time datetime="<?php echo date('c'); ?>"><?php echo date('H:i · d/m/Y'); ?></time>
+                    <time data-live-clock datetime="<?php echo date('c'); ?>"><?php echo date('H:i · d/m/Y'); ?></time>
                     <span class="staff-avatar" aria-hidden="true">NV</span>
                     <span class="staff-header-name"><?php echo e($user['name']); ?></span>
                 </div>
@@ -182,5 +193,11 @@ try {
                 <?php echo $content; ?>
             </main>
         </div>
-    </body>
+        <?php if (!empty($_SESSION['admin_access_denied'])): ?>
+        <?php unset($_SESSION['admin_access_denied']); ?>
+        <script>
+            window.alert('Bạn không có quyền truy cập khu vực quản trị.');
+        </script>
+    <?php endif; ?>
+</body>
 </html>

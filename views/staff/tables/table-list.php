@@ -20,8 +20,8 @@ unset($table);
 <div class="page-heading">
     <div>
         <p class="eyebrow">KHÔNG GIAN PHỤC VỤ</p>
-        <h1>Quản lý bàn</h1>
-        <p>Chọn bàn trống để đón khách hoặc mở Theo dõi phục vụ để xem order và gọi bổ sung.</p>
+        <h1>Sơ đồ bàn</h1>
+        <p>Đón khách, sắp xếp bàn và theo dõi từng lượt phục vụ.</p>
     </div>
 </div>
 <section class="table-overview" aria-label="Lọc trạng thái bàn">
@@ -43,7 +43,14 @@ unset($table);
         <?php $stateClass = $table['display_status'] === 'Trống' ? 'is-free' : 'is-occupied'; ?>
         <article class="table-card <?php echo $stateClass; ?>">
             <div class="table-card-heading">
-                <span class="table-symbol" aria-hidden="true">▦</span>
+                <span class="table-symbol" aria-hidden="true">
+                    <svg viewBox="0 0 64 64" fill="none">
+                        <rect x="16" y="16" width="32" height="32" rx="10" fill="currentColor" fill-opacity=".1" stroke="currentColor" stroke-width="2"/>
+                        <path d="M25 10h14M25 54h14M10 25v14M54 25v14" stroke="currentColor" stroke-width="5" stroke-linecap="round"/>
+                        <circle cx="32" cy="32" r="7" stroke="currentColor" stroke-width="1.5"/>
+                        <path d="M29 32h6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                    </svg>
+                </span>
                 <span class="table-state"><i aria-hidden="true"></i><?php echo e($table['display_status']); ?></span>
             </div>
             <h2><?php echo e($table['name']); ?></h2>
@@ -59,13 +66,13 @@ unset($table);
                 <?php endif; ?>
             <?php elseif ($table['order_id']): ?>
                 <p class="table-description">Order #<?php echo $table['order_id']; ?></p>
-                <div class="table-order-total"><span>Tổng tạm tính</span><strong><?php echo tien($table['total']); ?></strong></div>
+                <div class="table-order-total"><span>Tổng tạm tính</span><strong><?php echo tien($model->total($table['order_id'])); ?></strong></div>
                 <div class="table-card-actions">
                     <a class="button table-tracking-button full" href="?page=order-detail&id=<?php echo $table['order_id']; ?>">Theo dõi phục vụ →</a>
                 </div>
             <?php elseif ($table['display_status'] === 'Trống'): ?>
-                <p class="table-description">Sẵn sàng đón khách</p>
-                <div class="table-available">Bàn chưa có khách</div>
+
+                
                 <form method="post">
                     <?php csrfInput(); ?>
                     <input type="hidden" name="table_id" value="<?php echo $table['id']; ?>">

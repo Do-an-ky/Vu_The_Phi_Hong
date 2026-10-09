@@ -1,0 +1,187 @@
+/* Xem hóa đơn bên cạnh phần thanh toán, không rời trang. */
+.staff-payments-page .payment-workspace {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 24px;
+    align-items: start;
+}
+.staff-payments-page .payment-workspace.has-preview {
+    grid-template-columns: minmax(0, 1fr) minmax(400px, 0.9fr);
+}
+.payment-main {
+    min-width: 0;
+}
+.staff-payments-page .invoice-preview {
+    position: static;
+
+
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    min-width: 0;
+    height: calc(100dvh - 40px);
+    max-height: 900px;
+    padding: 22px;
+    border: 1px solid #c9dccf;
+    border-top: 4px solid #246344;
+    border-radius: 16px;
+    background: #ffffff;
+    box-shadow: none;
+}
+.staff-payments-page .invoice-preview[hidden],
+#invoice-preview-frame[hidden],
+#invoice-preview-status[hidden] {
+    display: none;
+}
+.invoice-preview-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+}
+.invoice-preview-toolbar h2 {
+    margin: 5px 0 0;
+    font-size: 21px;
+    color: #23432e;
+}
+#invoice-preview-frame {
+    width: 100%;
+    flex: 1;
+    min-height: 250px;
+    border: 1px solid #e5ebe6;
+    border-radius: 10px;
+    background: #ffffff;
+}
+#invoice-preview-status {
+    flex: 1;
+    padding: 28px 8px;
+    color: #677c6c;
+    font-size: 14px;
+}
+.staff-payments-page .receipt-view-button[aria-current="true"] {
+    background: #205a3a;
+    color: #ffffff;
+    border-color: #205a3a;
+}
+@media (max-width: 1100px) {
+    .staff-payments-page .payment-workspace.has-preview {
+        grid-template-columns: minmax(0, 1fr);
+    }
+    .staff-payments-page .invoice-preview {
+        position: static;
+        height: 75dvh;
+        min-height: 450px;
+        padding: 18px;
+    }
+}
+/* Chỉ lịch sử thanh toán chia hai cột, phần thu tiền phía trên độc lập. */
+.staff-payments-page .payment-workspace {
+    margin-top: 48px;
+    padding-top: 32px;
+    border-top: 1px solid #d7e2dc;
+}
+.staff-payments-page .payment-main > .payment-history {
+    margin-top: 0;
+}
+/* Danh sách hóa đơn cuộn cùng trang, không tạo vùng cuộn lồng nhau. */
+.staff-payments-page .payment-main {
+    height: auto;
+    max-height: none;
+    overflow: visible;
+}
+@media (min-width: 1101px) {
+    .staff-payments-page .invoice-preview {
+        position: sticky;
+        top: 20px;
+        height: calc(100dvh - 40px);
+        max-height: 900px;
+        min-height: 0;
+        border: 0;
+        border-left: 1px solid #dce6df;
+        border-radius: 0;
+    }
+    #invoice-preview-frame {
+        min-height: 0;
+    }
+}
+/* Lịch sử nằm trực tiếp trên nền trang, không bọc panel thứ hai. */
+.staff-payments-page .payment-history {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    box-shadow: none;
+}
+.staff-payments-page .payment-history .receipt-link {
+    background: #ffffff;
+}
+.staff-payments-page .payment-history .receipt-filter {
+    padding: 0 0 20px;
+    background: transparent;
+    border: 0;
+    border-bottom: 1px solid #dce6df;
+    border-radius: 0;
+}
+.staff-payments-page .receipt-pagination {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    gap: 18px;
+    margin-top: 18px;
+}
+.staff-payments-page .receipt-pagination span {
+    margin-right: auto;
+    color: #617567;
+    font-size: 13px;
+}
+.staff-payments-page .receipt-pagination button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 48px;
+    width: 48px;
+    height: 40px;
+    padding: 0;
+    border: 1px solid #d8e3dd;
+    border-radius: 8px;
+    background: #ffffff;
+    color: #24583b;
+    cursor: pointer;
+    transition: background-color 150ms, border-color 150ms;
+}
+
+.staff-payments-page .receipt-pagination button::before {
+    content: '';
+    width: 7px;
+    height: 7px;
+    border-top: 2px solid currentColor;
+    border-right: 2px solid currentColor;
+}
+
+.staff-payments-page .receipt-pagination .pagination-up::before {
+    transform: translateY(2px) rotate(-45deg);
+}
+
+.staff-payments-page .receipt-pagination .pagination-down::before {
+    transform: translateY(-2px) rotate(135deg);
+}
+.staff-payments-page .receipt-pagination button:hover:not(:disabled) {
+    background: #dcece1;
+}
+.staff-payments-page .receipt-pagination button:disabled {
+    opacity: 0.4;
+    cursor: default;
+}
+.staff-payments-page .receipt-pagination button:focus-visible {
+    outline: 3px solid #82ab90;
+    outline-offset: 2px;
+}
+
+.staff-payments-page .receipt-link[hidden] {
+    display: none;
+}
+
+.staff-payments-page .payment-history {
+    scroll-margin-top: 20px;
+}

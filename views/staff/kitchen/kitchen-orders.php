@@ -7,6 +7,7 @@ $tickets = $model->all("SELECT k.*, t.name AS table_name FROM kitchen_tickets k
     ORDER BY k.id");
 $tables = array();
 foreach ($tickets as $ticket) {
+    $ticket['items'] = $model->ticketItems($ticket['id']);
     $stage = $ticket['status'] === 'Chờ kiểm món' ? 'Chờ hoàn tất' : $ticket['status'];
     $tables[$stage][$ticket['order_id']][] = $ticket;
 }
@@ -31,9 +32,12 @@ $columns = array('Chờ bếp', 'Đang nấu', 'Chờ hoàn tất');
             ?>
             <article class="kitchen-card" data-order-id="<?php echo (int) $orderId; ?>" data-table-name="<?php echo e($tableTickets[0]['table_name']); ?>">
                 <h3>Phiếu bếp – <?php echo e($tableTickets[0]['table_name']); ?></h3>
+                <?php if ($column === 'Đang nấu'): ?>
+                    <button type="button" class="button" data-select-all>Chọn tất cả các món</button>
+                <?php endif; ?>
                 <div class="item-progress-list">
                 <?php foreach ($tableTickets as $ticket): ?>
-                    <?php foreach ($model->ticketItems($ticket['id']) as $item): ?>
+                    <?php foreach ($ticket['items'] as $item): ?>
                         <?php
                         $done = $item['item_ready_at'] && $item['item_served_at'];
                         if (!$done) $allReady = false;
@@ -43,13 +47,12 @@ $columns = array('Chờ bếp', 'Đang nấu', 'Chờ hoàn tất');
                             <?php if ($item['note'] !== ''): ?><p class="food-note"><?php echo e($item['note']); ?></p><?php endif; ?>
                             <p class="item-progress-status"><?php echo $done ? '✓ Đã mang ra bàn' : ($ticket['status'] === 'Chờ bếp' ? 'Món mới · Chờ nhận' : 'Chưa nấu xong'); ?></p>
                             <?php if (!$done && $ticket['status'] !== 'Chờ bếp'): ?>
-                                <form method="post" class="item-progress-form">
+                                <div class="item-progress-form">
                                     <?php csrfInput(); ?>
                                     <input type="hidden" name="ticket_id" value="<?php echo (int) $ticket['id']; ?>">
                                     <input type="hidden" name="detail_id" value="<?php echo (int) $item['id']; ?>">
-                                    <label><input type="checkbox" name="done" value="yes" required> Đã nấu xong đủ số lượng và mang ra bàn</label>
-                                    <button class="button" name="action" value="item-ready">Lưu xác nhận</button>
-                                </form>
+                                    <label><input type="checkbox" name="done" value="yes"> Đã nấu xong đủ số lượng và mang ra bàn</label>
+                                </div>
                             <?php endif; ?>
                         </div>
                     <?php endforeach; ?>
@@ -65,7 +68,7 @@ $columns = array('Chờ bếp', 'Đang nấu', 'Chờ hoàn tất');
                         <?php if ($column === 'Chờ bếp'): ?>
                             <button class="button primary full" name="action" value="accept-table">Nhận phiếu · Nấu các món mới</button>
                         <?php else: ?>
-                            <button class="button primary full" name="action" value="ready-table" <?php if (!$allReady) echo 'disabled'; ?>>Đã hoàn thành · Chờ hoàn tất</button>
+                            <button class="button primary full" name="action" value="ready-table" disabled>Xác nhận</button>
                         <?php endif; ?>
                     </form>
                 <?php endif; ?>

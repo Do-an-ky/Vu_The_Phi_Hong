@@ -16,8 +16,9 @@ if (!$user) {
     chuyenTrang('index.php');
 }
 if ($user['role'] !== 'admin') {
-    http_response_code(403);
-    echo '<meta charset="utf-8"><p>Bạn không có quyền quản trị.</p><a href="staff.php">Về khu vực nhân viên</a>';
+    // Chặn tại server, chuyển về nhân viên và chỉ thông báo một lần.
+    $_SESSION['admin_access_denied'] = true;
+    chuyenTrang('staff.php');
     exit;
 }
 
@@ -137,12 +138,17 @@ try {
 <!DOCTYPE html>
 <html lang="vi">
 <head>
+    <link rel="icon" type="image/svg+xml" href="public/favicon.svg?v=1">
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title><?php echo e($title); ?> | RESTAURANT Admin</title>
     <link rel="stylesheet" href="public/css/admin.css?v=<?php echo filemtime(__DIR__ . '/public/css/admin.css'); ?>">
     <script src="public/js/admin.js?v=<?php echo filemtime(__DIR__ . '/public/js/admin.js'); ?>" defer></script>
     <link rel="stylesheet" href="public/css/ui-refresh.css?v=<?php echo filemtime(__DIR__ . '/public/css/ui-refresh.css'); ?>">
+    <?php if ($page === 'dashboard'): ?>
+        <link rel="stylesheet" href="public/css/admin-dashboard.css?v=<?php echo filemtime(__DIR__ . '/public/css/admin-dashboard.css'); ?>">
+    <?php endif; ?>
+<script src="public/js/clock.js?v=<?php echo filemtime(__DIR__ . '/public/js/clock.js'); ?>" defer></script>
 </head>
 <body class="admin-shell">
     <a class="skip-link" href="#main-content">Đến nội dung chính</a>
@@ -171,7 +177,7 @@ try {
     <div class="admin-workspace">
         <header class="topbar">
             <span>Nhà hàng <span class="muted">/</span> <?php echo e($title); ?></span>
-            <time datetime="<?php echo date('c'); ?>"><?php echo date('H:i'); ?> · <?php echo date('d/m/Y'); ?></time>
+            <time data-live-clock datetime="<?php echo date('c'); ?>"><?php echo date('H:i'); ?> · <?php echo date('d/m/Y'); ?></time>
         </header>
         <main id="main-content" class="<?php echo $page === 'dashboard' ? 'dashboard-page' : ''; ?>">
             <div class="page-heading">

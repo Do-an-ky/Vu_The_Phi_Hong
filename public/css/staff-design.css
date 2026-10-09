@@ -101,179 +101,242 @@
         font-size: 10px;
     }
 
+    /* Trang quản lý bàn: bố cục và trạng thái chỉ áp dụng ở trang này. */
     .staff-tables-page .workspace > main {
-        max-width: none;
-        padding: 30px 32px 40px;
+        width: 100%;
+        max-width: 1600px;
+        margin: 0 auto;
+        padding: 36px 36px 48px;
     }
 
     .staff-tables-page .page-heading {
-        margin-bottom: 22px;
+        margin: 0 0 28px;
     }
 
     .staff-tables-page .page-heading .eyebrow {
-        margin-bottom: 4px;
-        color: #173c2e;
+        margin: 0 0 8px;
+        color: #39705b;
         font-size: 11px;
-        letter-spacing: 0.6px;
+        font-weight: 700;
+        letter-spacing: 1.6px;
     }
 
     .staff-tables-page .page-heading h1 {
-        margin: 0 0 6px;
-        font-size: 29px;
-        line-height: 1.25;
-        color: #102a3b;
+        margin: 0 0 10px;
+        color: #15352b;
+        font-size: clamp(28px, 2.5vw, 36px);
+        line-height: 1.2;
+        letter-spacing: -0.8px;
     }
 
     .staff-tables-page .page-heading p:not(.eyebrow) {
+        max-width: 700px;
         margin: 0;
-        color: #74869d;
+        color: #65776f;
         font-size: 14px;
+        line-height: 1.7;
     }
 
     .staff-tables-page .table-overview {
-        gap: 16px;
-        margin-bottom: 28px;
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 18px;
+        margin: 0 0 34px;
     }
 
     .staff-tables-page .table-filter {
-        min-height: 68px;
-        padding: 16px 24px;
-        border-color: #dce5f0;
-        border-radius: 10px;
-        color: #193044;
-        font-size: 14px;
-        box-shadow: none;
+        min-width: 0;
+        min-height: 96px;
+        padding: 22px 24px;
+        border: 1px solid #dce6e0;
+        border-radius: 16px;
+        background: #ffffff;
+        color: #465e53;
+        font-size: 15px;
+        font-weight: 600;
+        box-shadow: 0 3px 12px #173c2e04;
+        gap: 12px;
     }
 
     .staff-tables-page .table-filter strong {
         color: inherit;
-        font-size: 25px;
+        font-size: 34px;
+        line-height: 1;
+        font-variant-numeric: tabular-nums;
     }
 
     .staff-tables-page .table-filter.is-active {
-        background: #0c3326;
-        border-color: #0c3326;
+        background: #143f30;
+        border-color: #143f30;
         color: #ffffff;
+        box-shadow: 0 6px 18px #143f301a;
     }
 
     .staff-tables-page .table-toolbar {
-        margin-bottom: 16px;
+        margin: 0 0 20px;
+        padding-bottom: 16px;
+        border-bottom: 1px solid #e0e8e3;
     }
 
     .staff-tables-page .table-toolbar h2 {
-        margin-bottom: 3px;
-        font-size: 16px;
+        margin: 0 0 5px;
+        font-size: 19px;
+        color: #253e32;
     }
 
     .staff-tables-page .table-toolbar p {
-        color: #74869d;
+        margin: 0;
+        color: #708078;
         font-size: 13px;
     }
 
     .staff-tables-page .table-directory {
-        grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
-        gap: 16px;
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(min(100%, 245px), 1fr));
+        gap: 22px;
+        align-items: stretch;
     }
 
     .staff-tables-page .table-directory .table-card {
-        min-height: 210px;
-        padding: 16px;
-        border: 1px solid #dce5f0;
-        border-radius: 12px;
-        box-shadow: 0 2px 5px rgba(29, 51, 71, 0.03);
+        display: flex;
+        flex-direction: column;
+        min-width: 0;
+        min-height: 284px;
+        padding: 24px;
+        background: #ffffff;
+        border: 1px solid #dce6e0;
+        border-radius: 18px;
+        box-shadow: 0 4px 16px #15352b05;
+    }
+
+    .staff-tables-page .table-directory .table-card:hover {
+        transform: none;
+        border-color: #91b5a3;
+        box-shadow: 0 8px 24px #15352b0d;
     }
 
     .staff-tables-page .table-directory .is-occupied {
-        background: #fff8ef;
-        border-color: #ffc080;
-    }
-
-    .staff-tables-page .table-directory .is-payment {
-        background: #fff9e9;
-        border-color: #eac46f;
+        background: #fffbf5;
+        border-color: #edcfa9;
     }
 
     .staff-tables-page .table-card-heading {
-        margin-bottom: 12px;
+        margin: 0 0 20px;
+        gap: 8px;
+        flex-wrap: wrap;
     }
 
     .staff-tables-page .table-symbol {
-        width: 30px;
-        height: 30px;
-        border-radius: 7px;
-        background: #f0f4f8;
-        color: #78605b;
-        font-size: 21px;
+        display: grid;
+        place-items: center;
+        width: 42px;
+        height: 42px;
+        border-radius: 12px;
+        background: #f0f6f2;
+        color: #357256;
+        font-size: 26px;
+    }
+
+    .staff-tables-page .is-occupied .table-symbol {
+        background: #fff0dc;
+        color: #a55616;
     }
 
     .staff-tables-page .table-state {
-        padding: 4px 9px;
-        background: #dcfce7;
-        color: #16814b;
-        font-size: 11px;
+        padding: 6px 10px;
+        background: #e8f5ec;
+        color: #24613e;
+        font-size: 12px;
+        font-weight: 600;
+        white-space: nowrap;
     }
 
     .staff-tables-page .is-occupied .table-state {
-        background: #ffedd5;
-        color: #c3480a;
-    }
-
-    .staff-tables-page .is-payment .table-state {
-        background: #fef0c7;
-        color: #946200;
+        background: #ffecd2;
+        color: #9b480e;
     }
 
     .staff-tables-page .table-directory h2 {
-        margin-bottom: 5px;
-        color: #102a3b;
-        font-size: 21px;
+        margin: 0 0 6px;
+        color: #1b3528;
+        font-size: 25px;
+        line-height: 1.3;
+        overflow-wrap: anywhere;
     }
 
-    .staff-tables-page .table-description {
-        margin-bottom: 8px;
-        color: #74869d;
-        font-size: 12px;
+    .staff-tables-page .table-card > .table-description {
+        margin: 0 0 18px;
+        color: #6e7d73;
+        font-size: 13px;
+        line-height: 1.6;
     }
 
     .staff-tables-page .table-order-total,
     .staff-tables-page .table-available {
-        padding: 0;
-        margin-bottom: 14px;
-        border: 0;
-        font-size: 12px;
+        min-height: 48px;
+        padding: 14px 0;
+        margin: 0 0 18px;
+        border-top: 1px solid #e8eae3;
+        border-bottom: 0;
+        color: #657567;
+        font-size: 13px;
+        gap: 8px;
+        align-items: center;
     }
 
     .staff-tables-page .table-order-total strong {
-        color: #cf470a;
-        font-size: 15px;
+        color: #9b480e;
+        font-size: 19px;
+        font-variant-numeric: tabular-nums;
+        overflow-wrap: anywhere;
+    }
+
+    .staff-tables-page .table-directory .table-card-actions,
+    .staff-tables-page .table-directory .table-card > form {
+        margin-top: auto;
+        width: 100%;
     }
 
     .staff-tables-page .table-directory .button {
-        min-height: 38px;
-        padding: 9px 10px;
-        border-radius: 8px;
-        font-size: 12px;
-        line-height: 1.4;
+        width: 100%;
+        min-height: 46px;
+        padding: 12px;
+        border-radius: 10px;
+        font-size: 13px;
+        line-height: 1.5;
+        font-weight: 650;
+        white-space: normal;
         box-shadow: none;
     }
 
     .staff-tables-page .table-directory .primary {
-        background: #0c3326;
-        border-color: #0c3326;
+        background: #17513b;
+        border-color: #17513b;
+        color: #ffffff;
+    }
+
+    .staff-tables-page .table-directory .primary:hover {
+        background: #103e2d;
+        border-color: #103e2d;
     }
 
     .staff-tables-page .table-directory .table-tracking-button {
-        background: #ec5808;
-        border-color: #ec5808;
+        background: #b45316;
+        border-color: #b45316;
         color: #ffffff;
     }
 
     .staff-tables-page .table-directory .table-tracking-button:hover {
-        background: #cb4600;
-        border-color: #cb4600;
+        background: #934210;
+        border-color: #934210;
+    }
+
+    .staff-tables-page .table-filter:focus-visible,
+    .staff-tables-page .table-directory .button:focus-visible {
+        outline: 3px solid #75a78e;
+        outline-offset: 4px;
     }
 }
-
 @media screen and (max-width: 900px) {
     .staff-shell > .sidebar {
         position: static;
@@ -310,4 +373,1039 @@
         padding: 12px;
         font-size: 12px;
     }
+}
+
+@media screen and (max-width: 540px) {
+    .staff-tables-page .table-overview {
+        gap: 8px;
+    }
+
+    .staff-tables-page .table-filter {
+        flex-direction: column;
+        justify-content: center;
+        gap: 10px;
+        min-height: 88px;
+    }
+
+    .staff-tables-page .table-filter strong {
+        font-size: 26px;
+    }
+
+    .staff-tables-page .table-directory .table-card {
+        min-height: 260px;
+        padding: 22px;
+    }
+}
+/* Khu vực bếp: chỉ trình bày, giữ nguyên form và xử lý trạng thái. */
+@media screen {
+    .staff-kitchen-page .workspace > main {
+        width: 100%;
+        max-width: 1800px;
+        margin: 0 auto;
+        padding: 32px;
+    }
+
+    .staff-kitchen-page .page-heading {
+        gap: 20px;
+        margin-bottom: 28px;
+    }
+
+    .staff-kitchen-page .page-heading h1 {
+        margin: 0 0 10px;
+        font-size: 34px;
+        color: #15352b;
+        letter-spacing: -0.7px;
+    }
+
+    .staff-kitchen-page .page-heading .eyebrow {
+        margin: 0 0 8px;
+        color: #39705b;
+        font-size: 11px;
+        letter-spacing: 1.6px;
+    }
+
+    .staff-kitchen-page .page-heading p:not(.eyebrow) {
+        margin: 0;
+        color: #65776f;
+        font-size: 14px;
+        line-height: 1.7;
+    }
+
+    .staff-kitchen-page .kitchen-board {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 24px;
+        align-items: start;
+    }
+
+    .staff-kitchen-page .kitchen-column {
+        --stage-color: #a86015;
+        --stage-tint: #fff5e6;
+        min-width: 0;
+        padding: 20px;
+        background: #f0f3f1;
+        border: 1px solid #dde5df;
+        border-top: 4px solid var(--stage-color);
+        border-radius: 18px;
+        box-shadow: none;
+    }
+
+    .staff-kitchen-page .kitchen-column:nth-child(2) {
+        --stage-color: #3566a0;
+        --stage-tint: #edf4fd;
+    }
+
+    .staff-kitchen-page .kitchen-column:nth-child(3) {
+        --stage-color: #28744c;
+        --stage-tint: #edf8ef;
+    }
+
+    .staff-kitchen-page .kitchen-column > h2 {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin: 0 0 20px;
+        padding: 4px 0 16px;
+        border-bottom: 1px solid #dce5df;
+        font-size: 20px;
+        color: #243e30;
+    }
+
+    .staff-kitchen-page .kitchen-column > h2::before {
+        content: '';
+        width: 10px;
+        height: 10px;
+        flex: 0 0 10px;
+        border-radius: 50%;
+        background: var(--stage-color);
+    }
+
+    .staff-kitchen-page .kitchen-table-search {
+        padding: 0;
+        margin: 0 0 22px;
+        background: transparent;
+        border: 0;
+        color: #586d60;
+        font-size: 12px;
+        font-weight: 600;
+        box-shadow: none;
+    }
+
+    .staff-kitchen-page .kitchen-table-search input {
+        width: 100%;
+        min-width: 0;
+        min-height: 46px;
+        margin-top: 8px;
+        padding: 12px 40px 12px 14px;
+        border: 1px solid #d1ded5;
+        border-radius: 10px;
+        background-color: #ffffff;
+        background-position: right 14px center;
+        color: #254333;
+        font-size: 13px;
+    }
+
+    .staff-kitchen-page .kitchen-card {
+        margin: 0 0 20px;
+        padding: 20px;
+        border: 1px solid #dbe5de;
+        border-radius: 14px;
+        background: #ffffff;
+        box-shadow: 0 4px 14px #173c2e06;
+        overflow-wrap: anywhere;
+    }
+
+    .staff-kitchen-page .kitchen-card > h3 {
+        margin: 0;
+        padding: 0 0 16px;
+        border-bottom: 1px solid #e8eee9;
+        font-size: 18px;
+        line-height: 1.5;
+        color: #193d2b;
+    }
+
+    .staff-kitchen-page .item-progress-list {
+        gap: 14px;
+        margin: 18px 0;
+    }
+
+    .staff-kitchen-page .item-progress-row {
+        padding: 16px;
+        border: 1px solid #e3eae5;
+        border-radius: 10px;
+        background: #fafcfb;
+    }
+
+    .staff-kitchen-page .item-progress-row > strong {
+        display: block;
+        color: #203e2e;
+        font-size: 16px;
+        line-height: 1.5;
+    }
+
+    .staff-kitchen-page .food-note {
+        margin: 10px 0 0;
+        padding: 9px 11px;
+        border-left: 3px solid #d6a253;
+        border-radius: 4px;
+        background: #fff5e4;
+        color: #854c11;
+        font-size: 13px;
+        line-height: 1.6;
+    }
+
+    .staff-kitchen-page .item-progress-status {
+        margin: 10px 0 0;
+        font-size: 12px;
+        line-height: 1.6;
+        color: #5c7264;
+    }
+
+    .staff-kitchen-page .item-progress-form {
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 12px;
+        margin-top: 14px;
+        padding-top: 14px;
+        border-top: 1px dashed #d7e2da;
+    }
+
+    .staff-kitchen-page .item-progress-form label {
+        align-items: flex-start;
+        padding: 4px 0;
+        font-size: 13px;
+        line-height: 1.6;
+        color: #465f4e;
+        cursor: pointer;
+    }
+
+    .staff-kitchen-page .item-progress-form input[type="checkbox"] {
+        margin-top: 1px;
+        accent-color: #17513b;
+    }
+
+    .staff-kitchen-page .kitchen-card .button {
+        width: 100%;
+        min-height: 44px;
+        margin-top: 0;
+        padding: 11px 12px;
+        border-radius: 9px;
+        font-size: 13px;
+        line-height: 1.5;
+        white-space: normal;
+        box-shadow: none;
+    }
+
+    .staff-kitchen-page .item-progress-form .button {
+        color: #245840;
+        background: #eff7f2;
+        border: 1px solid #c5dcca;
+    }
+
+    .staff-kitchen-page .item-progress-form .button:hover {
+        background: #e0efe5;
+    }
+
+    .staff-kitchen-page .kitchen-card .primary {
+        background: #17513b;
+        border-color: #17513b;
+        color: #ffffff;
+    }
+
+    .staff-kitchen-page .kitchen-card .primary:not(:disabled):hover {
+        background: #103e2d;
+    }
+
+    .staff-kitchen-page .kitchen-card button:disabled {
+        background: #e8ede9;
+        border-color: #dce4de;
+        color: #76867b;
+        opacity: 1;
+    }
+
+    .staff-kitchen-page .kitchen-save-message {
+        margin: 12px 0 0;
+        padding: 10px 12px;
+        border-radius: 8px;
+        background: #edf6ef;
+        color: #315b40;
+        font-size: 13px;
+        line-height: 1.6;
+    }
+
+    .staff-kitchen-page .kitchen-column > .empty {
+        margin: 0;
+        padding: 40px 18px;
+        border: 1px dashed #cfdcd3;
+        border-radius: 12px;
+        background: #ffffff80;
+        color: #75837a;
+        font-size: 13px;
+        text-align: center;
+    }
+
+    .staff-kitchen-page .kitchen-card .button:focus-visible,
+    .staff-kitchen-page .item-progress-form input:focus-visible {
+        outline: 3px solid #87b39a;
+        outline-offset: 3px;
+    }
+}
+
+@media screen and (max-width: 1250px) {
+    .staff-kitchen-page .workspace > main {
+        padding: 24px;
+    }
+
+    .staff-kitchen-page .kitchen-board {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 20px;
+    }
+}
+
+@media screen and (max-width: 700px) {
+    .staff-kitchen-page .workspace > main {
+        padding: 24px 16px;
+    }
+
+    .staff-kitchen-page .kitchen-board {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .staff-kitchen-page .page-heading {
+        flex-wrap: wrap;
+    }
+
+    .staff-kitchen-page .kitchen-column {
+        padding: 16px;
+    }
+}
+/* Tên bàn nổi bật trên hóa đơn và trong khung xem trước. */
+body.staff-shell .invoice p.invoice-table-name {
+    margin: 20px 0 16px;
+    font-size: 21px;
+    font-weight: 700;
+    line-height: 1.4;
+    color: #164d3b;
+}
+/* Sơ đồ bàn: tông màu nhà hàng, trạng thái rõ và thao tác đồng nhất. */
+@media screen {
+    body.staff-tables-page {
+        background: #f6f5f0;
+    }
+
+    .staff-tables-page .workspace > main {
+        max-width: 1680px;
+        padding: 36px 40px 48px;
+    }
+
+    .staff-tables-page .page-heading {
+        padding: 0 0 24px;
+        margin-bottom: 24px;
+        border-bottom: 1px solid #dedfd5;
+    }
+
+    .staff-tables-page .page-heading h1 {
+        font-size: clamp(28px, 3vw, 38px);
+    }
+
+    .staff-tables-page .table-overview {
+        gap: 16px;
+        margin-bottom: 32px;
+    }
+
+    .staff-tables-page .table-filter {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        min-height: 86px;
+        padding: 20px 24px;
+        border-radius: 14px;
+        border-color: #e0e3d9;
+        box-shadow: none;
+    }
+
+    .staff-tables-page .table-filter strong {
+        font-size: 30px;
+    }
+
+    .staff-tables-page .table-filter.is-active {
+        background: #173f32;
+        border-color: #173f32;
+        box-shadow: 0 6px 16px #173f3210;
+    }
+
+    .staff-tables-page .table-toolbar {
+        border: 0;
+        padding: 0;
+        margin-bottom: 20px;
+    }
+
+    .staff-tables-page .table-directory {
+        grid-template-columns: repeat(auto-fill, minmax(min(100%, 240px), 1fr));
+        gap: 20px;
+    }
+
+    .staff-tables-page .table-directory .table-card {
+        position: relative;
+        min-height: 300px;
+        padding: 22px;
+        border: 1px solid #dce5db;
+        border-radius: 18px;
+        background: #ffffff;
+        box-shadow: 0 4px 14px #253e3205;
+    }
+
+    .staff-tables-page .table-directory .is-occupied {
+        background: #fffaf2;
+        border-color: #e8cba6;
+    }
+
+    .staff-tables-page .table-card-heading {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        flex-wrap: nowrap;
+        gap: 10px;
+        margin-bottom: 14px;
+    }
+
+    .staff-tables-page .table-symbol {
+        flex: 0 0 68px;
+        width: 68px;
+        height: 68px;
+        border-radius: 16px;
+        background: #f0f5ee;
+        color: #34634c;
+    }
+
+    .staff-tables-page .table-symbol svg {
+        display: block;
+        width: 58px;
+        height: 58px;
+    }
+
+    .staff-tables-page .is-occupied .table-symbol {
+        background: #f9ecd9;
+        color: #a96727;
+    }
+
+    .staff-tables-page .table-state {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        margin-top: 4px;
+        padding: 7px 10px;
+        border-radius: 20px;
+        font-size: 12px;
+    }
+
+    .staff-tables-page .table-directory h2 {
+        font-size: 24px;
+        letter-spacing: -.4px;
+    }
+
+    .staff-tables-page .table-card > .table-description {
+        margin-bottom: 14px;
+    }
+
+    .staff-tables-page .table-order-total,
+    .staff-tables-page .table-available {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        min-height: 46px;
+        padding: 12px 0;
+        margin-bottom: 18px;
+        border-top: 1px solid #e6e9e0;
+    }
+
+    .staff-tables-page .table-directory .button {
+        min-height: 46px;
+        border-radius: 10px;
+        font-size: 13px;
+    }
+
+    .staff-tables-page .table-directory .table-tracking-button {
+        background: #a85d23;
+        border-color: #a85d23;
+    }
+}
+
+@media screen and (max-width: 900px) {
+    .staff-tables-page .workspace > main {
+        padding: 24px 20px 36px;
+    }
+}
+
+@media screen and (max-width: 540px) {
+    .staff-tables-page .table-overview {
+        gap: 8px;
+    }
+
+    .staff-tables-page .table-filter {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+        padding: 14px 12px;
+        font-size: 13px;
+    }
+
+    .staff-tables-page .table-filter strong {
+        font-size: 26px;
+    }
+}
+/* Thực đơn có ảnh: giữ nguyên lưới ba khu vực và sự kiện chọn món. */
+.staff-shell #menu-form .menu-grid {
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 180px), 1fr));
+    gap: 16px;
+}
+
+.staff-shell #menu-form .menu-item {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    padding: 0;
+    overflow: hidden;
+    border: 1px solid #dce5df;
+    border-radius: 14px;
+    background: #ffffff;
+    box-shadow: 0 3px 10px #123b2c08;
+}
+
+.staff-shell #menu-form .menu-item[hidden] {
+    display: none;
+}
+
+.staff-shell #menu-form .dish-photo {
+    position: relative;
+    display: block;
+    flex: 0 0 auto;
+    width: 100%;
+    min-height: 0;
+    padding: 0;
+    margin: 0;
+    border: 0;
+    border-radius: 0;
+    background: #eef3ed;
+    cursor: pointer;
+    overflow: hidden;
+    aspect-ratio: 4 / 3;
+}
+
+.staff-shell #menu-form .dish-photo img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.staff-shell #menu-form .dish-photo .dish-price {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    margin: 0;
+    padding: 7px 10px;
+    border-radius: 7px;
+    background: #165741;
+    color: #ffffff;
+    font-size: 14px;
+    line-height: 1.3;
+    box-shadow: 0 2px 8px #00000018;
+}
+
+.staff-shell #menu-form .menu-item .food-category {
+    margin: 13px 14px 5px;
+    font-size: 10px;
+    line-height: 1.4;
+    color: #78877f;
+    letter-spacing: .8px;
+}
+
+.staff-shell #menu-form .menu-item h3 {
+    min-height: 44px;
+    margin: 0 14px 12px;
+    font-size: 16px;
+    line-height: 1.4;
+    color: #183c2f;
+}
+
+.staff-shell #menu-form .menu-item .dish-action {
+    width: calc(100% - 28px);
+    min-height: 38px;
+    margin: auto 14px 12px;
+    padding: 8px 10px;
+    border: 1px solid #d7e5dc;
+    border-radius: 8px;
+    background: #f0f6f2;
+    color: #19533d;
+    font-size: 12px;
+    line-height: 1.4;
+}
+
+.staff-shell #menu-form .menu-item .dish-selection {
+    margin: 0 14px 12px;
+    min-height: 0;
+    font-size: 12px;
+    color: #236c4f;
+}
+
+.staff-shell #menu-form .menu-item .dish-selection:empty {
+    display: none;
+}
+
+.staff-shell #menu-form .dish-photo:focus-visible {
+    outline: 3px solid #d2a34e;
+    outline-offset: -3px;
+}
+
+.staff-shell #menu-form .dish-action:hover {
+    background: #e0eee5;
+}
+/* Không ép các hàng món vừa chiều cao màn hình: cuộn danh sách thay vì cắt thẻ. */
+.staff-shell #menu-form .menu-grid {
+    grid-auto-rows: max-content;
+    align-content: start;
+    align-items: stretch;
+    overflow-y: auto;
+    overflow-x: hidden;
+    scrollbar-gutter: stable;
+    scrollbar-width: thin;
+    scrollbar-color: #8fae9e #eef3ef;
+}
+
+.staff-shell #menu-form .menu-item {
+    height: auto;
+    min-height: max-content;
+}
+
+.staff-shell #menu-form .menu-item > * {
+    flex-shrink: 0;
+}
+
+.staff-shell #menu-form .dish-photo {
+    height: auto;
+}
+
+.staff-shell #menu-form .menu-grid::-webkit-scrollbar {
+    width: 9px;
+}
+
+.staff-shell #menu-form .menu-grid::-webkit-scrollbar-track {
+    background: #eef3ef;
+    border-radius: 8px;
+}
+
+.staff-shell #menu-form .menu-grid::-webkit-scrollbar-thumb {
+    background: #8fae9e;
+    border: 2px solid #eef3ef;
+    border-radius: 8px;
+}
+
+@media screen and (max-width: 900px) {
+    .staff-shell #menu-form .menu-grid {
+        max-height: 70dvh;
+    }
+}
+/* Danh mục ngang phía trên tìm kiếm, dành toàn bộ chiều rộng cho món. */
+.staff-shell #menu-form .menu-workspace {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    min-width: 0;
+    min-height: 0;
+}
+
+.staff-shell #menu-form .category-menu {
+    display: flex;
+    flex: 0 0 auto;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    min-width: 0;
+    padding: 4px 2px 8px;
+    overflow-x: auto;
+    scrollbar-width: thin;
+    scrollbar-color: #8fae9e #eef3ef;
+}
+
+.staff-shell #menu-form .category-menu .category-button {
+    display: inline-flex;
+    flex: 0 0 auto;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: auto;
+    min-width: 0;
+    min-height: 44px;
+    margin: 0;
+    padding: 10px 18px;
+    border: 1px solid #d6e2da;
+    border-radius: 10px;
+    background: #ffffff;
+    color: #365c49;
+    font-size: 14px;
+    line-height: 1.4;
+    white-space: nowrap;
+    box-shadow: none;
+}
+
+.staff-shell #menu-form .category-menu .category-button span {
+    white-space: nowrap;
+}
+
+.staff-shell #menu-form .category-menu .category-button strong {
+    padding: 2px 7px;
+    border-radius: 6px;
+    background: #edf3ef;
+    color: inherit;
+    font-size: 12px;
+}
+
+.staff-shell #menu-form .category-menu .category-button.active {
+    border-color: #17543e;
+    background: #17543e;
+    color: #ffffff;
+}
+
+.staff-shell #menu-form .category-menu .category-button.active strong {
+    background: #ffffff24;
+}
+
+.staff-shell #menu-form .category-menu .category-button:focus-visible {
+    outline: 2px solid #b58a3f;
+    outline-offset: 2px;
+}
+
+.staff-shell #menu-form .menu-content {
+    flex: 1 1 auto;
+    height: auto;
+    min-width: 0;
+    min-height: 0;
+}
+
+@media screen and (min-width: 901px) {
+    .staff-shell #menu-form .menu-content {
+        flex: 1 1 0;
+    }
+}
+/* Kiểm tra và xác nhận trực tiếp tại phiếu: ưu tiên diện tích cột bên phải. */
+@media screen and (min-width: 901px) {
+    .staff-shell #menu-form .order-layout {
+        grid-template-columns: minmax(0, 1fr) clamp(390px, 38vw, 600px);
+        gap: 24px;
+    }
+}
+
+.staff-shell #menu-form .menu-grid {
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 160px), 1fr));
+}
+
+.staff-shell #menu-form .ticket .cart-row {
+    padding: 18px;
+    margin-bottom: 14px;
+}
+
+.staff-shell #menu-form .ticket .cart-row strong {
+    overflow-wrap: anywhere;
+}
+
+@media screen and (min-width: 901px) and (max-width: 1150px) {
+    .staff-shell #menu-form .order-layout {
+        grid-template-columns: minmax(0, 1fr) 360px;
+        gap: 16px;
+    }
+}
+/* Phiếu gọn: tên và tiền bên trái, thao tác ở góc phải của từng món. */
+.staff-shell #menu-form .ticket #cart-summary .cart-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: start;
+    gap: 7px 12px;
+    padding: 13px 14px;
+    margin-bottom: 10px;
+    border-radius: 10px;
+}
+
+.staff-shell #menu-form #cart-summary .cart-item-head {
+    grid-column: 1;
+    grid-row: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+    min-width: 0;
+}
+
+.staff-shell #menu-form #cart-summary .cart-item-name {
+    flex: none;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.staff-shell #menu-form #cart-summary .cart-item-amount {
+    margin: 0;
+    font-size: 13px;
+    line-height: 1.4;
+}
+
+.staff-shell #menu-form #cart-summary .cart-item-actions {
+    grid-column: 2;
+    grid-row: 1;
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 6px;
+    margin: 0;
+}
+
+.staff-shell #menu-form #cart-summary .cart-item-actions .button {
+    flex: 0 0 auto;
+    width: 34px;
+    min-width: 34px;
+    min-height: 34px;
+    height: 34px;
+    padding: 0;
+    border-radius: 7px;
+    font-size: 15px;
+    line-height: 1;
+    box-shadow: none;
+}
+
+.staff-shell #menu-form #cart-summary .cart-item-actions .button:last-child {
+    width: 44px;
+    font-size: 12px;
+}
+
+.staff-shell #menu-form #cart-summary .food-note {
+    grid-column: 1 / -1;
+    margin: 0;
+    font-size: 12px;
+    line-height: 1.5;
+    overflow-wrap: anywhere;
+}
+/* Phiếu dạng bảng, các cột luôn thẳng hàng giữa tên, số lượng và tiền. */
+.staff-shell #menu-form #cart-summary .cart-table {
+    width: 100%;
+    min-width: 420px;
+    border-collapse: collapse;
+    table-layout: fixed;
+    font-size: 13px;
+}
+
+.staff-shell #menu-form #cart-summary .cart-table th {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    padding: 12px 8px;
+    background: #eaf1ed;
+    color: #365448;
+    font-size: 12px;
+    text-align: left;
+    border-bottom: 1px solid #d9e4dd;
+}
+
+.staff-shell #menu-form #cart-summary .cart-table th:nth-child(2) {
+    width: 38px;
+    text-align: center;
+}
+
+.staff-shell #menu-form #cart-summary .cart-table th:nth-child(3) {
+    width: 100px;
+    text-align: right;
+}
+
+.staff-shell #menu-form #cart-summary .cart-table th:nth-child(4) {
+    width: 108px;
+    text-align: right;
+}
+
+.staff-shell #menu-form #cart-summary .cart-table td {
+    padding: 13px 8px;
+    vertical-align: top;
+    border-bottom: 1px solid #e2e9e4;
+    background: #ffffff;
+}
+
+.staff-shell #menu-form #cart-summary .cart-table .cart-item-head {
+    display: table-cell;
+}
+
+.staff-shell #menu-form #cart-summary .cart-table .cart-item-name {
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+.staff-shell #menu-form #cart-summary .cart-table .food-note {
+    margin-top: 5px;
+    font-size: 11px;
+}
+
+.staff-shell #menu-form #cart-summary .cart-table-quantity {
+    text-align: center;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+}
+
+.staff-shell #menu-form #cart-summary .cart-table-amount {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+}
+
+.staff-shell #menu-form #cart-summary .cart-table-actions {
+    text-align: right;
+    white-space: nowrap;
+}
+
+.staff-shell #menu-form #cart-summary .cart-table-actions .button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    min-width: 0;
+    height: 32px;
+    min-height: 32px;
+    padding: 0;
+    margin: 0 0 0 3px;
+    font-size: 13px;
+    border-radius: 6px;
+    box-shadow: none;
+}
+
+.staff-shell #menu-form #cart-summary .cart-table-actions .button:last-child {
+    width: 35px;
+    font-size: 11px;
+}
+
+.staff-shell #menu-form #cart-summary {
+    overflow-x: auto;
+}
+/* Phiếu bắt đầu bằng tên cột; hai nút thao tác nằm dưới tổng tiền. */
+.staff-shell #menu-form .order-layout > .ticket {
+    display: grid;
+    grid-template-rows: minmax(0, 1fr) auto auto;
+    gap: 16px;
+}
+
+.staff-shell #menu-form .ticket::before {
+    display: none;
+}
+
+.staff-shell #menu-form .draft-footer-actions {
+    display: flex;
+    align-items: stretch;
+    gap: 10px;
+}
+
+.staff-shell #menu-form .draft-footer-actions .button {
+    min-height: 46px;
+    margin: 0;
+    padding: 11px 14px;
+    font-size: 13px;
+    line-height: 1.4;
+    border-radius: 9px;
+}
+
+.staff-shell #menu-form .draft-footer-actions .primary {
+    flex: 1;
+    min-width: 0;
+}
+
+.staff-shell #menu-form .draft-footer-actions .clear-draft {
+    flex: 0 0 auto;
+    border: 1px solid #e5c8c3;
+    background: #fff7f5;
+    color: #a13d30;
+    box-shadow: none;
+}
+
+.staff-shell #menu-form .draft-footer-actions .clear-draft:disabled {
+    opacity: .45;
+    cursor: default;
+}
+
+.staff-shell #menu-form #cart-summary .cart-table .cart-table-empty {
+    padding: 30px 12px;
+    text-align: center;
+    color: #78877f;
+    font-weight: 400;
+}
+/* Bảng món phủ toàn chiều ngang khung phiếu. */
+.staff-shell #menu-form .order-layout > .ticket {
+    padding: 0 0 20px;
+}
+
+.staff-shell #menu-form .ticket > #cart-summary {
+    width: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+.staff-shell #menu-form #cart-summary .cart-table {
+    width: 100%;
+    margin: 0;
+}
+
+.staff-shell #menu-form #cart-summary .cart-table th:first-child,
+.staff-shell #menu-form #cart-summary .cart-table td:first-child {
+    padding-left: 20px;
+}
+
+.staff-shell #menu-form #cart-summary .cart-table th:last-child,
+.staff-shell #menu-form #cart-summary .cart-table td:last-child {
+    padding-right: 20px;
+}
+
+.staff-shell #menu-form .ticket > .ticket-total,
+.staff-shell #menu-form .ticket > .draft-footer-actions {
+    margin-left: 20px;
+    margin-right: 20px;
+}
+/* Dành thêm chiều ngang cho thao tác và tăng vùng bấm. */
+.staff-shell #menu-form #cart-summary .cart-table {
+    min-width: 470px;
+}
+
+.staff-shell #menu-form #cart-summary .cart-table th:nth-child(2) {
+    width: 40px;
+}
+
+.staff-shell #menu-form #cart-summary .cart-table th:nth-child(3) {
+    width: 95px;
+    text-align: left;
+}
+
+.staff-shell #menu-form #cart-summary .cart-table th:nth-child(4) {
+    width: 170px;
+    text-align: right;
+}
+
+.staff-shell #menu-form #cart-summary .cart-table-amount {
+    text-align: left;
+}
+
+.staff-shell #menu-form #cart-summary .cart-table-actions .button {
+    width: 40px;
+    height: 42px;
+    min-height: 42px;
+    margin-left: 5px;
+    font-size: 17px;
+    border-radius: 8px;
+}
+
+.staff-shell #menu-form #cart-summary .cart-table-actions .button:last-child {
+    width: 52px;
+    font-size: 13px;
+}
+/* Dịch SL và thành tiền sang trái thêm, giữ nguyên kích thước nút. */
+.staff-shell #menu-form #cart-summary .cart-table th:nth-child(4) {
+    width: 210px;
+}
+/* Thẻ món chỉ giữ ảnh, tên và nút chọn. */
+.staff-shell #menu-form .menu-item h3 {
+    margin-top: 14px;
+}
+
+/* Dịch riêng cột SL sang trái, giữ vị trí thành tiền và thao tác. */
+.staff-shell #menu-form #cart-summary .cart-table th:nth-child(2) {
+    width: 60px;
 }

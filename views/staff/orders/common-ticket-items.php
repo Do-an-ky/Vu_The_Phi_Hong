@@ -2,13 +2,12 @@
 // Ghép các lần gọi món trong cùng lượt khách thành một danh sách.
 $commonItems = array();
 foreach ($tickets as $part) {
+    if ($part['status'] === 'Chờ in') continue;
     foreach ($model->ticketItems($part['id']) as $food) {
         if ($food['item_served_at']) {
             $food['progress'] = 'Đã mang ra bàn';
         } elseif ($food['item_ready_at']) {
             $food['progress'] = 'Đã nấu xong';
-        } elseif ($part['status'] === 'Chờ in') {
-            $food['progress'] = 'Món mới · Chưa gửi bếp';
         } elseif ($part['status'] === 'Chờ bếp') {
             $food['progress'] = 'Chờ bếp nhận';
         } else {

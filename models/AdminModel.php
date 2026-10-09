@@ -41,6 +41,31 @@ class AdminModel extends Restaurant
              ORDER BY o.created_at DESC, p.id DESC',
             array($start, $end)
         );
+        // Chỉ tính món thuộc đơn đã thu tiền, theo cùng ngày tạo đơn của dashboard.
+        // EXISTS tránh nhân đôi số lượng nếu một order có nhiều bản ghi thanh toán.
+        $soldProducts = $this->all(
+            "SELECT d.product_id,
+                    MAX(COALESCE(k.product_name, p.name, 'Sản phẩm đã xóa')) AS name,
+                    SUM(d.quantity) AS quantity,
+                    SUM(d.quantity * d.price) AS total
+             FROM order_details d
+             JOIN orders o ON o.id = d.order_id
+             LEFT JOIN products p ON p.id = d.product_id
+             LEFT JOIN (
+                 SELECT detail_id, MAX(product_name) AS product_name
+                 FROM kitchen_ticket_items GROUP BY detail_id
+             ) k ON k.detail_id = d.id
+             WHERE o.created_at >= ? AND o.created_at < ?
+               AND EXISTS (SELECT 1 FROM payments pay WHERE pay.order_id = o.id)
+               AND NOT EXISTS (
+                   SELECT 1 FROM kitchen_ticket_items pending_item
+                   JOIN kitchen_tickets pending ON pending.id = pending_item.ticket_id
+                   WHERE pending_item.detail_id = d.id AND pending.status = 'Chờ in'
+               )
+             GROUP BY d.product_id
+             ORDER BY quantity DESC, name ASC",
+            array($start, $end)
+        );
         return array(
             'invoices' => $invoices['value'],
             'revenue' => $revenue['value'],
@@ -50,6 +75,7 @@ class AdminModel extends Restaurant
             'other' => $revenue['other'],
             'date' => $date,
             'tables' => $tables['value'],
+            'sold_products' => $soldProducts,
             'day_invoices' => $dayInvoices
         );
     }
@@ -180,14 +206,14 @@ class AdminModel extends Restaurant
         }
     }
 
-    public function saveProduct($id, $categoryId, $name, $price, $status)
+    public function saveProduct($id, $categoryId, $name, $price, $status, $image = null)
     {
         $this->lockCategory($categoryId);
         if ($id) {
             $this->lockProduct($id);
-            $this->query('UPDATE products SET category_id = ?, name = ?, price = ?, status = ? WHERE id = ?', array($categoryId, $name, $price, $status, $id));
+            $this->query('UPDATE products SET category_id = ?, name = ?, price = ?, status = ?, image = ? WHERE id = ?', array($categoryId, $name, $price, $status, $image, $id));
         } else {
-            $this->query('INSERT INTO products(category_id, name, price, status) VALUES (?, ?, ?, ?)', array($categoryId, $name, $price, $status));
+            $this->query('INSERT INTO products(category_id, name, price, status, image) VALUES (?, ?, ?, ?, ?)', array($categoryId, $name, $price, $status, $image));
         }
     }
 

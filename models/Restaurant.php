@@ -81,13 +81,24 @@ class Restaurant
                           FROM order_details d
                           JOIN products p ON p.id = d.product_id
                           LEFT JOIN kitchen_ticket_items k ON k.detail_id = d.id
-                          WHERE d.order_id = ? ORDER BY d.id', array($orderId));
+                          WHERE d.order_id = ?
+                            AND NOT EXISTS (
+                                SELECT 1 FROM kitchen_ticket_items pending_item
+                                JOIN kitchen_tickets pending ON pending.id = pending_item.ticket_id
+                                WHERE pending_item.detail_id = d.id AND pending.status = "Chờ in"
+                            )
+                          ORDER BY d.id', array($orderId));
     }
 
     public function total($orderId)
     {
         $row = $this->one('SELECT COALESCE(SUM(quantity * price), 0) AS total
-                          FROM order_details WHERE order_id = ?', array($orderId));
+                          FROM order_details d WHERE order_id = ?
+                           AND NOT EXISTS (
+                               SELECT 1 FROM kitchen_ticket_items i
+                               JOIN kitchen_tickets k ON k.id = i.ticket_id
+                               WHERE i.detail_id = d.id AND k.status = "Chờ in"
+                           )', array($orderId));
         return $row['total'];
     }
 
@@ -119,19 +130,19 @@ class Restaurant
         $row = $this->one(
             "SELECT
                 (SELECT COUNT(*) FROM service_sessions) AS tables,
-                (SELECT COUNT(*) FROM kitchen_tickets WHERE status = 'Chờ in') AS orders,
+                (SELECT COUNT(*) FROM kitchen_tickets k JOIN service_sessions s ON s.order_id = k.order_id WHERE k.status = 'Chờ in') AS orders,
                 (SELECT COUNT(*) FROM kitchen_tickets
                     WHERE status IN ('Chờ bếp', 'Đang nấu')) AS kitchen,
                 (SELECT COUNT(*) FROM orders o
                     JOIN service_sessions s ON s.order_id = o.id
                     WHERE o.status IN ('Đang phục vụ', 'Chờ thanh toán')
-                      AND EXISTS (SELECT 1 FROM kitchen_tickets k WHERE k.order_id = o.id)
+                      AND EXISTS (SELECT 1 FROM kitchen_tickets k WHERE k.order_id = o.id AND k.status <> 'Chờ in')
                       AND NOT EXISTS (SELECT 1 FROM kitchen_tickets k
-                          WHERE k.order_id = o.id
-                            AND k.status NOT IN ('Chờ kiểm món', 'Đã kiểm đủ', 'Đã phục vụ'))
+                          WHERE k.order_id = o.id AND k.status <> 'Chờ in'
+                            AND k.status NOT IN ('Chờ in', 'Chờ kiểm món', 'Đã kiểm đủ', 'Đã phục vụ'))
                       AND NOT EXISTS (SELECT 1 FROM kitchen_tickets k
                           JOIN kitchen_ticket_items i ON i.ticket_id = k.id
-                          WHERE k.order_id = o.id
+                          WHERE k.order_id = o.id AND k.status <> 'Chờ in'
                             AND (i.item_ready_at IS NULL OR i.item_served_at IS NULL))) AS payments"
         );
 
@@ -200,7 +211,7 @@ class Restaurant
             }
             return $old['id'];
         }
-        if ($order['status'] !== 'Đang phục vụ') {
+        if (!in_array($order['status'], array('Đang phục vụ', 'Chờ thanh toán'), true)) {
             throw new DomainException('Bàn đang chờ thanh toán. Chọn tiếp tục gọi món trước.');
         }
         if (!is_array($draftItems) || count($draftItems) > 200) {
@@ -232,6 +243,7 @@ class Restaurant
         if (count($items) === 0) {
             throw new DomainException('Hãy chọn ít nhất một món.');
         }
+
         $this->query("INSERT INTO kitchen_tickets(order_id, request_key, status)
                       VALUES (?, ?, 'Chờ in')", array($orderId, $requestKey));
         $ticketId = $this->conn->insert_id;
@@ -284,8 +296,20 @@ class Restaurant
         if ($ticket['status'] !== $from) {
             throw new DomainException('Trạng thái phiếu đã thay đổi. Hãy tải lại trang.');
         }
+        if ($action === 'send') {
+            $order = $this->lockOrder($ticket['order_id']);
+            if (!in_array($order['status'], array('Đang phục vụ', 'Chờ thanh toán'), true)) {
+                throw new DomainException('Lượt phục vụ đã kết thúc, không thể gửi phiếu này.');
+            }
+            if ($order['status'] === 'Chờ thanh toán') {
+                $this->resume($ticket['order_id']);
+            }
+        }
         // $column chỉ lấy từ switch ở trên, không lấy từ dữ liệu người dùng.
         $this->query("UPDATE kitchen_tickets SET status = ?, $column = NOW() WHERE id = ?", array($to, $ticketId));
+        if ($action === 'send') {
+            $this->query('UPDATE orders SET total = ? WHERE id = ?', array($this->total($ticket['order_id']), $ticket['order_id']));
+        }
         return $ticket['order_id'];
     }
 
@@ -343,7 +367,9 @@ class Restaurant
 
     public function ensureServed($orderId)
     {
-        $tickets = $this->tickets($orderId);
+        $tickets = array_values(array_filter($this->tickets($orderId), function ($ticket) {
+            return $ticket['status'] !== 'Chờ in';
+        }));
         if (count($tickets) === 0) {
             throw new DomainException('Chưa có món để thanh toán.');
         }
@@ -377,7 +403,12 @@ class Restaurant
     public function closeEmpty($orderId)
     {
         $order = $this->lockOrder($orderId);
-        $row = $this->one('SELECT COUNT(*) AS count FROM order_details WHERE order_id = ?', array($orderId));
+        $row = $this->one('SELECT COUNT(*) AS count FROM order_details d WHERE order_id = ?
+                           AND NOT EXISTS (
+                               SELECT 1 FROM kitchen_ticket_items i
+                               JOIN kitchen_tickets k ON k.id = i.ticket_id
+                               WHERE i.detail_id = d.id AND k.status = "Chờ in"
+                           )', array($orderId));
         if ($row['count'] > 0) {
             throw new DomainException('Chỉ được trả bàn chưa xác nhận món nào.');
         }

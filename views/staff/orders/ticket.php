@@ -6,11 +6,22 @@ $ticket = $model->one('SELECT k.*, t.name AS table_name FROM kitchen_tickets k
 if (!$ticket) {
     throw new DomainException('Không tìm thấy phiếu.');
 }
+if (($_GET['edit'] ?? '') === '1') {
+    if ($ticket['status'] !== 'Chờ in') {
+        throw new DomainException('Phiếu đã chuyển bếp, không thể sửa món.');
+    }
+    require __DIR__ . '/ticket-edit.php';
+    return;
+}
 // In lại từ theo dõi: lấy tất cả món của cùng lượt khách, không đổi trạng thái.
 $printWholeTable = ($_GET['scope'] ?? '') === 'table';
 $items = array();
+$pendingTickets = array();
 if ($printWholeTable) {
     foreach ($model->tickets($ticket['order_id']) as $part) {
+        if ($part['status'] === 'Chờ in') {
+            $pendingTickets[] = $part['id'];
+        }
         foreach ($model->ticketItems($part['id']) as $item) {
             $items[] = $item;
         }
@@ -20,8 +31,8 @@ if ($printWholeTable) {
 }
 ?>
 <div class="page-heading no-print">
-    <h1><?php echo $printWholeTable ? 'In lại toàn bộ món của bàn' : 'In phiếu order'; ?></h1>
-    <button type="button" class="button primary" data-print>In phiếu</button>
+    <h1><?php echo $printWholeTable ? 'In lại toàn bộ món của bàn' : 'In phiếu bếp'; ?></h1>
+    <button type="button" class="button primary" data-print>In phiếu bếp</button>
 </div>
 <section class="invoice">
     <div class="invoice-heading">
@@ -50,17 +61,32 @@ if ($printWholeTable) {
 </section>
 <div class="panel no-print section-title">
     <?php if ($printWholeTable): ?>
-        <p>In lại không gửi món xuống bếp và không thay đổi tiến độ phục vụ.</p>
-    <?php elseif ($ticket['status'] === 'Chờ in'): ?>
-        <p>Sau khi in thành công, xác nhận bên dưới để bếp nhận phiếu. Hủy hộp thoại in sẽ không tự chuyển trạng thái.</p>
-        <form method="post">
-            <?php csrfInput(); ?>
-            <input type="hidden" name="ticket_id" value="<?php echo $id; ?>">
-            <label class="check-list"><input type="checkbox" name="printed" value="yes" required> Tôi đã in phiếu thành công</label>
-            <button class="button primary" name="action" value="send">Đã in phiếu · Chuyển bếp</button>
-        </form>
-    <?php else: ?>
+        <p><?php echo $pendingTickets ? 'Còn món chưa gửi bếp. Sau khi in, bấm gửi món mới xuống bếp.' : 'Tất cả món đã gửi bếp. In lại không gửi lại món cũ.'; ?></p>
+    <?php elseif ($ticket['status'] !== 'Chờ in'): ?>
         <p>Phiếu hiện ở trạng thái: <?php echo e($ticket['status']); ?>. In lại không tạo phiếu mới.</p>
     <?php endif; ?>
-    <a class="text-link" href="?page=order-detail&id=<?php echo $ticket['order_id']; ?>">Quay về order</a>
+    <div class="actions">
+        <?php if ($printWholeTable && $pendingTickets): ?>
+            <form method="post">
+                <?php csrfInput(); ?>
+                <input type="hidden" name="order_id" value="<?php echo (int) $ticket['order_id']; ?>">
+                <?php foreach ($pendingTickets as $pendingId): ?>
+                    <input type="hidden" name="ticket_ids[]" value="<?php echo (int) $pendingId; ?>">
+                <?php endforeach; ?>
+                <button class="button primary" name="action" value="send-table">Đã in phiếu · Gửi món mới xuống bếp</button>
+            </form>
+        <?php endif; ?>
+        
+        <?php if (!$printWholeTable && $ticket['status'] === 'Chờ in'): ?>
+            <a class="button" href="?page=orders&id=<?php echo (int) $ticket['order_id']; ?>&ticket_id=<?php echo $id; ?>">Quay lại gọi món / Sửa món</a>
+            <form method="post">
+                <?php csrfInput(); ?>
+                <input type="hidden" name="ticket_id" value="<?php echo $id; ?>">
+                <button class="button primary" name="action" value="send">Đã in phiếu · Chuyển bếp</button>
+            </form>
+        <?php endif; ?>
+        <?php if ($printWholeTable || $ticket['status'] !== 'Chờ in'): ?>
+            <a class="button" href="?page=order-detail&id=<?php echo (int) $ticket['order_id']; ?>"><?php echo $printWholeTable ? 'Quay lại' : 'Quay về order'; ?></a>
+        <?php endif; ?>
+    </div>
 </div>

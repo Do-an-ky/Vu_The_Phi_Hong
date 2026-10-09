@@ -16,7 +16,7 @@ $items = $model->orderItems($id);
     <a class="button" href="?page=order-detail&id=<?php echo $id; ?>">Làm mới</a>
 </div>
 <section class="panel">
-    <h2>Tất cả món đã xác nhận</h2>
+    <h2>Món đã gửi bếp</h2>
     <?php require __DIR__ . '/items.php'; ?>
     <div class="ticket-total"><span>Tổng order</span><strong><?php echo tien($model->total($id)); ?></strong></div>
     <div class="actions">
@@ -46,17 +46,18 @@ $items = $model->orderItems($id);
 </section>
 <section class="panel section-title">
     <h2>Phiếu bếp – <?php echo e($order['table_name']); ?></h2>
+    <?php if (in_array($order['status'], array('Đang phục vụ', 'Chờ thanh toán'), true)): ?>
+        <?php foreach ($tickets as $pendingTicket): ?>
+            <?php if ($pendingTicket['status'] === 'Chờ in'): ?>
+                <p class="no-print"><a class="button" href="?page=orders&id=<?php echo $id; ?>&ticket_id=<?php echo (int) $pendingTicket['id']; ?>">Tiếp tục sửa phiếu chưa gửi</a></p>
+            <?php endif; ?>
+        <?php endforeach; ?>
+    <?php endif; ?>
     <?php if ($tickets): ?>
         <?php require __DIR__ . '/common-ticket-items.php'; ?>
         <div class="actions">
-            <a class="button primary" href="?page=ticket&id=<?php echo (int) $tickets[0]['id']; ?>&scope=table">In lại toàn bộ món của bàn</a>
-            <?php foreach ($tickets as $part): ?>
-                <?php if ($part['status'] !== 'Chờ in') continue; ?>
-                <a class="button" href="?page=ticket&id=<?php echo (int) $part['id']; ?>">
-                    In món mới
-                    · <?php echo e($part['created_at']); ?>
-                </a>
-            <?php endforeach; ?>
+            <a class="button primary" href="?page=ticket&id=<?php echo (int) $tickets[0]['id']; ?>&scope=table">In phiếu bếp</a>
+
         </div>
     <?php else: ?>
         <p class="empty">Bàn chưa có món đã xác nhận.</p>

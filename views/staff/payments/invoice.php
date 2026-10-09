@@ -20,11 +20,11 @@ $session = $model->one('SELECT * FROM service_sessions WHERE order_id = ?', arra
         <p>#<?php echo $id; ?> · Order #<?php echo $receipt['order_id']; ?></p>
         <p><?php echo e($receipt['created_at']); ?></p>
     </div>
-    <p><?php echo e($receipt['table_name']); ?> · Nhân viên: <?php echo e($receipt['staff_name']); ?></p>
+    <p class="invoice-table-name"><?php echo e($receipt['table_name']); ?></p>
     <?php require __DIR__ . '/../orders/items.php'; ?>
-    <div class="ticket-total"><span>Tổng thanh toán</span><strong><?php echo tien($receipt['total']); ?></strong></div>
-    <p>Phương thức: <?php echo e($receipt['payment_method']); ?></p>
-    <p>Đã nhận đủ tiền</p>
+    <div class="ticket-total"><span><?php echo e($receipt['payment_method']); ?></span><strong><?php echo tien($receipt['total']); ?></strong></div>
+
+
     <p class="hint">Cảm ơn quý khách. Hẹn gặp lại!</p>
 </section>
 <?php if ($session): ?>

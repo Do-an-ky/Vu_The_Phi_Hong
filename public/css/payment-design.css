@@ -1,0 +1,392 @@
+/* Trang thanh toán: bố cục thu ngân, không thay đổi nghiệp vụ. */
+@media screen {
+    .staff-payments-page .workspace > main {
+        width: 100%;
+        max-width: 1500px;
+        margin: 0 auto;
+        padding: 32px;
+    }
+
+    .staff-payments-page .page-heading {
+        margin-bottom: 28px;
+    }
+
+    .staff-payments-page .page-heading h1 {
+        margin: 0 0 8px;
+        font-size: 34px;
+        color: #173c2b;
+        letter-spacing: -0.7px;
+    }
+
+    .staff-payments-page .eyebrow {
+        margin-bottom: 7px;
+        color: #61806d;
+        font-size: 11px;
+        letter-spacing: 1.3px;
+    }
+
+    .staff-payments-page .page-heading p:not(.eyebrow) {
+        margin: 0;
+        color: #65776d;
+        font-size: 14px;
+    }
+
+    .staff-payments-page .checkout-layout {
+        display: grid;
+        grid-template-columns: 280px minmax(0, 1fr);
+        gap: 24px;
+        align-items: start;
+    }
+
+    .staff-payments-page .panel {
+        min-width: 0;
+        padding: 26px;
+        background: #ffffff;
+        border: 1px solid #dce6df;
+        border-radius: 16px;
+        box-shadow: 0 4px 18px #173c2b05;
+    }
+
+    .staff-payments-page .panel h2 {
+        margin: 0 0 22px;
+        color: #254733;
+        font-size: 21px;
+        line-height: 1.4;
+    }
+
+    .staff-payments-page .checkout-layout > .panel:first-child {
+        padding: 20px;
+    }
+
+    .staff-payments-page .checkout-layout > .panel:first-child h2 {
+        font-size: 17px;
+        margin-bottom: 18px;
+    }
+
+    .staff-payments-page .payment-choice {
+        display: flex;
+        flex-direction: column;
+        gap: 7px;
+        padding: 16px;
+        margin: 0 0 12px;
+        border: 1px solid #e1e8e3;
+        border-radius: 11px;
+        background: #fafcfb;
+        color: #2c503a;
+        text-decoration: none;
+    }
+
+    .staff-payments-page .payment-choice strong {
+        font-size: 16px;
+    }
+
+    .staff-payments-page .payment-choice small {
+        color: #697e6f;
+        font-size: 12px;
+        line-height: 1.6;
+    }
+
+    .staff-payments-page .payment-choice:hover {
+        border-color: #8aaf98;
+        background: #f0f6f2;
+    }
+
+    .staff-payments-page .payment-choice.is-active {
+        background: #eaf5ed;
+        border: 2px solid #35744d;
+        padding: 15px;
+    }
+
+    .staff-payments-page .payment-items-scroll {
+        width: 100%;
+        overflow-x: auto;
+        border: 1px solid #e4ebe6;
+        border-radius: 10px;
+    }
+
+    .staff-payments-page .data-table {
+        width: 100%;
+        margin: 0;
+        font-size: 14px;
+    }
+
+    .staff-payments-page .data-table th {
+        padding: 13px 16px;
+        font-size: 12px;
+        color: #59715f;
+        background: #f5f8f6;
+        white-space: nowrap;
+    }
+
+    .staff-payments-page .data-table td {
+        padding: 16px;
+        line-height: 1.5;
+        border-bottom: 1px solid #eaf0ec;
+    }
+
+    .staff-payments-page .ticket-total {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 14px;
+        margin: 24px 0;
+        padding: 24px;
+        background: #174b35;
+        border: 0;
+        border-radius: 12px;
+        color: #e4f0e8;
+        font-size: 16px;
+    }
+
+    .staff-payments-page .ticket-total strong {
+        color: #ffffff;
+        font-size: clamp(28px, 3vw, 38px);
+        font-variant-numeric: tabular-nums;
+        overflow-wrap: anywhere;
+        line-height: 1.3;
+    }
+
+    .staff-payments-page .payment-method {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 12px;
+        padding: 0;
+        margin: 0 0 20px;
+        border: 0;
+        min-width: 0;
+    }
+
+    .staff-payments-page .payment-method legend {
+        margin-bottom: 14px;
+        padding: 0;
+        color: #314e3b;
+        font-size: 15px;
+        font-weight: 650;
+    }
+
+    .staff-payments-page .payment-method label {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        min-width: 0;
+        min-height: 55px;
+        margin: 0;
+        padding: 14px;
+        border: 1px solid #d6e3da;
+        border-radius: 10px;
+        background: #fafcfb;
+        color: #3d5d47;
+        font-size: 14px;
+        cursor: pointer;
+    }
+
+    .staff-payments-page .payment-method label:has(input:checked) {
+        border-color: #32734b;
+        background: #edf7ef;
+        box-shadow: inset 0 0 0 1px #32734b;
+        font-weight: 650;
+    }
+
+    .staff-payments-page input[type="radio"],
+    .staff-payments-page input[type="checkbox"] {
+        width: 20px;
+        height: 20px;
+        min-height: 20px;
+        flex: 0 0 20px;
+        margin: 0;
+        accent-color: #24633f;
+    }
+
+    .staff-payments-page .check-list {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 16px 0;
+        margin: 0 0 12px;
+        font-size: 14px;
+        color: #425e4b;
+        cursor: pointer;
+    }
+
+    .staff-payments-page .button {
+        min-height: 46px;
+        padding: 12px 18px;
+        border-radius: 9px;
+        font-size: 14px;
+        box-shadow: none;
+    }
+
+    .staff-payments-page button[name="action"][value="pay"] {
+        min-height: 54px;
+        background: #17513b;
+        border-color: #17513b;
+        font-size: 16px;
+        font-weight: 700;
+        white-space: normal;
+    }
+
+    .staff-payments-page button[name="action"][value="pay"]:disabled {
+        background: #e4ebe6;
+        border-color: #dce4de;
+        color: #77867c;
+        opacity: 1;
+        cursor: not-allowed;
+    }
+
+    .staff-payments-page .panel.section-title {
+        margin-top: 30px;
+    }
+
+    .staff-payments-page .receipt-heading {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-bottom: 22px;
+    }
+
+    .staff-payments-page .receipt-heading h2 {
+        margin: 0;
+    }
+
+    .staff-payments-page .receipt-count {
+        padding: 7px 12px;
+        background: #eff5f0;
+        color: #587360;
+        border-radius: 8px;
+        font-size: 13px;
+    }
+
+    .staff-payments-page .receipt-filter {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: flex-end;
+        gap: 12px;
+        margin: 0 0 24px;
+        padding: 18px;
+        background: #f5f8f6;
+        border: 1px solid #e4ece6;
+        border-radius: 12px;
+    }
+
+    .staff-payments-page .receipt-filter label {
+        margin: 0;
+        font-size: 12px;
+        color: #587160;
+    }
+
+    .staff-payments-page .receipt-filter input {
+        min-height: 46px;
+        margin-top: 7px;
+        font-size: 14px;
+        background: white;
+        border-radius: 9px;
+    }
+
+    .staff-payments-page .receipt-list {
+        display: grid;
+        gap: 12px;
+    }
+
+    .staff-payments-page .receipt-link {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 20px;
+        padding: 18px 20px;
+        margin: 0;
+        border: 1px solid #e0e8e3;
+        border-radius: 11px;
+        box-shadow: none;
+    }
+
+    .staff-payments-page .receipt-main small {
+        display: block;
+        margin-top: 7px;
+        color: #6c8072;
+        font-size: 12px;
+    }
+
+    .staff-payments-page .receipt-actions {
+        display: flex;
+        align-items: center;
+        gap: 24px;
+        flex-wrap: wrap;
+    }
+
+    .staff-payments-page .receipt-actions > strong {
+        color: #214f34;
+        font-size: 19px;
+        font-variant-numeric: tabular-nums;
+    }
+
+    .staff-payments-page .receipt-view-button {
+        padding: 11px 14px;
+        min-height: 44px;
+        border: 1px solid #cbded1;
+        border-radius: 8px;
+        background: #f0f7f2;
+        color: #285b3a;
+        font-size: 13px;
+    }
+
+    .staff-payments-page .button:focus-visible,
+    .staff-payments-page a:focus-visible,
+    .staff-payments-page input:focus-visible {
+        outline: 3px solid #91b49c;
+        outline-offset: 3px;
+    }
+}
+
+@media screen and (max-width: 1150px) {
+    .staff-payments-page .workspace > main {
+        padding: 24px;
+    }
+
+    .staff-payments-page .checkout-layout {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .staff-payments-page .checkout-layout > .panel:first-child {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 12px;
+    }
+
+    .staff-payments-page .checkout-layout > .panel:first-child h2 {
+        grid-column: 1 / -1;
+        margin: 0 0 8px;
+    }
+
+    .staff-payments-page .payment-choice {
+        margin: 0;
+    }
+}
+
+@media screen and (max-width: 600px) {
+    .staff-payments-page .workspace > main {
+        padding: 24px 14px;
+    }
+
+    .staff-payments-page .panel {
+        padding: 18px;
+    }
+
+    .staff-payments-page .payment-method {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .staff-payments-page .receipt-filter label,
+    .staff-payments-page .receipt-filter input,
+    .staff-payments-page .receipt-actions {
+        width: 100%;
+    }
+
+    .staff-payments-page .receipt-actions {
+        justify-content: space-between;
+        gap: 12px;
+    }
+}

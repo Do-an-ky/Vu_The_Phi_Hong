@@ -9,13 +9,14 @@ $receipts = $model->receiptsByDate($receiptDate);
 $receiptDisplayDate = date('d/m/Y', strtotime($receiptDate));
 ?>
 <div class="page-heading"><div><p class="eyebrow">HOÀN TẤT PHỤC VỤ</p><h1>Thanh toán</h1><p>Chỉ xác nhận khi đã nhận đủ tiền từ khách.</p></div></div>
+
 <div class="checkout-layout">
     <section class="panel">
         <h2>Bàn đang phục vụ</h2>
         <?php foreach ($openOrders as $openOrder): ?>
-            <a class="payment-choice" href="?page=payments&id=<?php echo $openOrder['id']; ?>">
+            <a class="payment-choice <?php if ((int) $openOrder['id'] === $id) echo 'is-active'; ?>" <?php if ((int) $openOrder['id'] === $id) echo 'aria-current="true"'; ?> href="?page=payments&id=<?php echo $openOrder['id']; ?>">
                 <strong><?php echo e($openOrder['table_name']); ?></strong>
-                <small><?php echo e($openOrder['status']); ?> · <?php echo tien($openOrder['total']); ?></small>
+                <small><?php echo e($openOrder['status']); ?> · <?php echo tien($model->total($openOrder['id'])); ?></small>
             </a>
         <?php endforeach; ?>
         <?php if (count($openOrders) === 0): ?><p class="empty">Không có bàn đang phục vụ.</p><?php endif; ?>
@@ -26,7 +27,9 @@ $receiptDisplayDate = date('d/m/Y', strtotime($receiptDate));
         <?php else: ?>
             <h2><?php echo e($order['table_name']); ?> · Order #<?php echo $id; ?></h2>
             <?php $items = $model->orderItems($id); ?>
+            <div class="payment-items-scroll">
             <?php require __DIR__ . '/../orders/items.php'; ?>
+            </div>
             <div class="ticket-total"><span>Tổng thanh toán</span><strong><?php echo tien($model->total($id)); ?></strong></div>
             <?php if (in_array($order['status'], array('Đang phục vụ', 'Chờ thanh toán'), true)): ?>
                 <?php
@@ -62,7 +65,8 @@ $receiptDisplayDate = date('d/m/Y', strtotime($receiptDate));
         <?php endif; ?>
     </section>
 </div>
-<section class="panel section-title">
+<div class="payment-workspace" id="payment-workspace"><div class="payment-main">
+<section class="payment-history">
     <div class="receipt-heading">
         <div>
             <p class="eyebrow">LỊCH SỬ THANH TOÁN</p>
@@ -76,9 +80,9 @@ $receiptDisplayDate = date('d/m/Y', strtotime($receiptDate));
             <input type="hidden" name="id" value="<?php echo $id; ?>">
         <?php endif; ?>
         <label for="receipt-date">Chọn ngày thanh toán
-            <input id="receipt-date" type="date" name="receipt_date" min="1000-01-01" max="9999-12-31" value="<?php echo e($receiptDate); ?>" required>
+            <input id="receipt-date" type="date" name="receipt_date" min="1000-01-01" max="9999-12-31" value="<?php echo e($receiptDate); ?>" onchange="if (this.checkValidity()) this.form.requestSubmit();" required>
         </label>
-        <button class="button primary" type="submit">Xem hóa đơn</button>
+        
         <a class="button" href="?page=payments<?php if ($id > 0) echo '&id=' . $id; ?>">Hôm nay</a>
     </form>
     <div class="receipt-list">
@@ -90,10 +94,21 @@ $receiptDisplayDate = date('d/m/Y', strtotime($receiptDate));
             </span>
             <span class="receipt-actions">
                 <strong><?php echo tien($receipt['total']); ?></strong>
-                <a class="receipt-view-button" href="?page=invoice&id=<?php echo $receipt['id']; ?>">Xem hóa đơn →</a>
+                <a class="receipt-view-button" href="?page=invoice&id=<?php echo $receipt['id']; ?>">Xem hóa đơn</a>
             </span>
         </div>
     <?php endforeach; ?>
     <?php if (count($receipts) === 0): ?><p class="empty">Không có hóa đơn trong ngày đã chọn.</p><?php endif; ?>
     </div>
 </section>
+</div>
+<aside class="invoice-preview" id="invoice-preview" aria-label="Chi tiết hóa đơn" hidden>
+    <div class="invoice-preview-toolbar">
+        <div><span class="eyebrow">CHI TIẾT</span><h2 id="invoice-preview-title">Hóa đơn</h2></div>
+        <button type="button" class="button" id="close-invoice-preview" aria-label="Đóng hóa đơn">Đóng</button>
+    </div>
+    <p id="invoice-preview-status" role="status">Chọn “Xem hóa đơn” trong danh sách bên trái để xem chi tiết tại đây.</p>
+    <iframe id="invoice-preview-frame" title="Nội dung hóa đơn" hidden></iframe>
+    <button type="button" class="button primary full" id="print-invoice-preview" disabled>In hóa đơn</button>
+</aside>
+</div>

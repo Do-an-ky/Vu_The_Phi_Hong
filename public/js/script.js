@@ -48,9 +48,22 @@ function capNhatNutHoanThanh(card) {
         return;
     }
     const checks = card.querySelectorAll('.item-progress-form input[name="done"]');
-    button.disabled = Array.from(checks).some(function (check) { return !check.checked; });
+    const selected = Array.from(checks).filter(function (check) { return check.checked; }).length;
+    button.disabled = selected === 0;
+    button.textContent = checks.length > 0 && selected === checks.length
+        ? 'Đã hoàn thành' : 'Xác nhận';
 }
 
+document.addEventListener("click", function (event) {
+    const button = event.target.closest('[data-select-all]');
+    if (!button) return;
+    const card = button.closest('.kitchen-card');
+    if (card.dataset.saving === 'yes') return;
+    const checks = Array.from(card.querySelectorAll('.item-progress-form input[name="done"]'));
+    const select = checks.some(function (check) { return !check.checked; });
+    checks.forEach(function (check) { check.checked = select; });
+    capNhatNutHoanThanh(card);
+});
 document.addEventListener("change", function (event) {
     if (event.target.matches('.kitchen-card .item-progress-form input[name="done"]')) {
         capNhatNutHoanThanh(event.target.closest(".kitchen-card"));
@@ -78,6 +91,10 @@ document.addEventListener("submit", async function (event) {
             }
         }
     }
+    const selectedForms = Array.from(card.querySelectorAll('.item-progress-form')).filter(function (itemForm) {
+        return itemForm.querySelector('input[name="done"]').checked;
+    });
+    if (submitter.value === 'ready-table' && selectedForms.length === 0) return;
     card.dataset.saving = "yes";
     submitter.disabled = true;
     let message = card.querySelector(".kitchen-save-message");
@@ -98,35 +115,33 @@ document.addEventListener("submit", async function (event) {
         if (!response.ok || !result.success) {
             throw new Error(result.message || "Không thể lưu xác nhận.");
         }
-        const itemForms = submitter.value === "ready-table"
-            ? Array.from(card.querySelectorAll(".item-progress-form")) : [form];
-        for (const itemForm of itemForms) {
-            itemForm.closest(".item-progress-row").querySelector(".item-progress-status").textContent = "✓ Đã mang ra bàn";
+        // Lưu các món đã chọn tại Đang nấu; chưa chuyển từng món sang cột khác.
+        for (const itemForm of selectedForms) {
+            const row = itemForm.closest('.item-progress-row');
+            row.querySelector('.item-progress-status').textContent = '✓ Đã mang ra bàn';
             itemForm.remove();
         }
-        if (submitter.value === "ready-table") {
+        message.textContent = 'Đã lưu xác nhận ' + selectedForms.length + ' món.';
+        const remaining = result.remaining_ticket_ids;
+        if (Array.isArray(remaining) && remaining.length === 0) {
             form.remove();
-            const columns = document.querySelectorAll(".kitchen-column");
-            const completedColumn = columns[columns.length - 1];
-            for (const empty of completedColumn.querySelectorAll(":scope > .empty")) {
-                empty.remove();
-            }
-            card.hidden = false;
+            card.querySelector('[data-select-all]')?.remove();
+            const completedColumn = document.querySelectorAll('.kitchen-column')[2];
             const existing = Array.from(completedColumn.querySelectorAll('.kitchen-card')).find(function (other) {
                 return other.dataset.orderId === card.dataset.orderId;
             });
             if (existing) {
-                // Nối món vừa xong vào cùng bàn, không tạo thêm thẻ trùng tên.
                 existing.querySelector('.item-progress-list').append(...card.querySelector('.item-progress-list').children);
                 existing.appendChild(message);
                 card.remove();
             } else {
                 completedColumn.appendChild(card);
             }
+            message.textContent = 'Tất cả món đã xong · Chờ hoàn tất';
+            for (const empty of completedColumn.querySelectorAll(':scope > .empty:not(.kitchen-search-empty)')) {
+                empty.remove();
+            }
             completedColumn.querySelector('[data-kitchen-table-search]')?.dispatchEvent(new Event('input'));
-            message.textContent = "Đã hoàn thành · Chờ hoàn tất";
-        } else {
-            message.textContent = "Đã lưu xác nhận.";
         }
         taiThongBaoSidebar();
     } catch (error) {
@@ -182,7 +197,20 @@ function capNhatPhieu() {
     summary.replaceChildren();
     fields.replaceChildren();
     let total = 0;
-    const quantityByProduct = {};
+    const cartTable = document.createElement("table");
+    cartTable.className = "cart-table";
+    const tableHead = document.createElement("thead");
+    const headingRow = document.createElement("tr");
+    for (const label of ["Tên món", "SL", "Thành tiền", "Thao tác"]) {
+        const heading = document.createElement("th");
+        heading.scope = "col";
+        heading.textContent = label;
+        headingRow.appendChild(heading);
+    }
+    tableHead.appendChild(headingRow);
+    const tableBody = document.createElement("tbody");
+    cartTable.append(tableHead, tableBody);
+    summary.appendChild(cartTable);
 
     for (let index = 0; index < draftItems.length; index++) {
         const item = draftItems[index];
@@ -193,31 +221,35 @@ function capNhatPhieu() {
 
         item.quantity = Number(item.quantity);
         item.note = String(item.note || "").trim();
-        quantityByProduct[item.product_id] = (quantityByProduct[item.product_id] || 0) + item.quantity;
 
-        const row = document.createElement("div");
-        row.className = "cart-row";
-        const head = document.createElement("div");
+        const row = document.createElement("tr");
+        row.className = "cart-table-row";
+        const head = document.createElement("td");
         head.className = "cart-item-head";
         const name = document.createElement("p");
         name.className = "cart-item-name";
-        name.textContent = item.quantity + " × " + card.dataset.name;
+        name.textContent = card.dataset.name;
         const amount = document.createElement("strong");
         amount.className = "cart-item-amount";
         amount.textContent = dinhDangTien(item.quantity * Number(card.dataset.price));
         head.appendChild(name);
-        head.appendChild(amount);
+        const quantityCell = document.createElement("td");
+        quantityCell.className = "cart-table-quantity";
+        quantityCell.textContent = item.quantity;
+        const amountCell = document.createElement("td");
+        amountCell.className = "cart-table-amount";
+        amountCell.appendChild(amount);
         row.appendChild(head);
 
         if (item.note !== "") {
             const detail = document.createElement("p");
             detail.className = "food-note";
             detail.textContent = "Ghi chú: " + item.note;
-            row.appendChild(detail);
+            head.appendChild(detail);
         }
 
-        const actions = document.createElement("div");
-        actions.className = "cart-item-actions";
+        const actions = document.createElement("td");
+        actions.className = "cart-table-actions";
         const minus = document.createElement("button");
         minus.type = "button";
         minus.className = "button";
@@ -251,8 +283,8 @@ function capNhatPhieu() {
         actions.appendChild(minus);
         actions.appendChild(plus);
         actions.appendChild(edit);
-        row.appendChild(actions);
-        summary.appendChild(row);
+        row.append(quantityCell, amountCell, actions);
+        tableBody.appendChild(row);
 
         fields.appendChild(taoInputAn("product_id[]", item.product_id));
         fields.appendChild(taoInputAn("quantity[]", item.quantity));
@@ -260,15 +292,16 @@ function capNhatPhieu() {
         total += item.quantity * Number(card.dataset.price);
     }
 
-    const cards = document.querySelectorAll(".menu-item");
-    for (let index = 0; index < cards.length; index++) {
-        const quantity = quantityByProduct[cards[index].dataset.id] || 0;
-        cards[index].querySelector(".dish-selection").textContent =
-            quantity > 0 ? "Đang có trong phiếu: " + quantity : "";
-    }
+
 
     if (draftItems.length === 0) {
-        summary.textContent = "Chưa chọn món nào.";
+        const emptyRow = document.createElement("tr");
+        const emptyCell = document.createElement("td");
+        emptyCell.colSpan = 4;
+        emptyCell.className = "cart-table-empty";
+        emptyCell.textContent = "Chưa chọn món nào.";
+        emptyRow.appendChild(emptyCell);
+        tableBody.appendChild(emptyRow);
     }
     document.getElementById("draft-total").textContent = dinhDangTien(total);
     const clearButton = document.getElementById("clear-draft");
