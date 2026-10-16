@@ -186,10 +186,7 @@ try {
                 <?php if ($errorMessage !== ''): ?>
                     <div class="notice error no-print" role="alert"><?php echo e($errorMessage); ?></div>
                 <?php endif; ?>
-                <?php if (isset($_SESSION['message'])): ?>
-                    <div class="notice no-print" role="status"><?php echo e($_SESSION['message']); ?></div>
-                    <?php unset($_SESSION['message']); ?>
-                <?php endif; ?>
+                <?php unset($_SESSION['message']); ?>
                 <?php echo $content; ?>
             </main>
         </div>

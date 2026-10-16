@@ -80,8 +80,6 @@ function xuLyNhanVien($model, $user)
         $model->conn->rollback();
         throw $error;
     }
-
-    $_SESSION['message'] = 'Đã cập nhật thành công.';
     chuyenTrang($redirect);
 }
 

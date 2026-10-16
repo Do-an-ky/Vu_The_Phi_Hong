@@ -232,7 +232,6 @@ function xuLyNhanVien($model, $user)
         echo json_encode($response);
         exit;
     }
-    $_SESSION['message'] = 'Đã cập nhật thành công.';
     chuyenTrang($redirect);
 }
 

@@ -76,7 +76,6 @@ try {
             $adminModel->conn->rollback();
             throw $error;
         }
-        $_SESSION['admin_message'] = 'Đã cập nhật thành công.';
         chuyenTrang('admin.php?page=' . $page);
     }
 } catch (DomainException $error) {
@@ -189,10 +188,7 @@ try {
             <?php if ($errorMessage !== ''): ?>
                 <div class="notice error" role="alert"><?php echo e($errorMessage); ?></div>
             <?php endif; ?>
-            <?php if (isset($_SESSION['admin_message'])): ?>
-                <div class="notice success" role="status"><?php echo e($_SESSION['admin_message']); ?></div>
-                <?php unset($_SESSION['admin_message']); ?>
-            <?php endif; ?>
+            <?php unset($_SESSION['admin_message']); ?>
             <?php if ($dataReady): ?>
                 <?php require __DIR__ . '/views/admin/' . $pages[$page][1]; ?>
             <?php else: ?>

@@ -20,7 +20,8 @@ $pendingTickets = array();
 if ($printWholeTable) {
     foreach ($model->tickets($ticket['order_id']) as $part) {
         if ($part['status'] === 'Chờ in') {
-            $pendingTickets[] = $part['id'];
+            // In lại từ theo dõi không lấy các bản nháp chưa gửi.
+            continue;
         }
         foreach ($model->ticketItems($part['id']) as $item) {
             $items[] = $item;
@@ -78,15 +79,19 @@ if ($printWholeTable) {
         <?php endif; ?>
         
         <?php if (!$printWholeTable && $ticket['status'] === 'Chờ in'): ?>
-            <a class="button" href="?page=orders&id=<?php echo (int) $ticket['order_id']; ?>&ticket_id=<?php echo $id; ?>">Quay lại gọi món / Sửa món</a>
             <form method="post">
                 <?php csrfInput(); ?>
                 <input type="hidden" name="ticket_id" value="<?php echo $id; ?>">
                 <button class="button primary" name="action" value="send">Đã in phiếu · Chuyển bếp</button>
             </form>
+            <a class="button" href="?page=orders&id=<?php echo (int) $ticket['order_id']; ?>&ticket_id=<?php echo $id; ?>">Quay lại gọi món / Sửa món</a>
         <?php endif; ?>
         <?php if ($printWholeTable || $ticket['status'] !== 'Chờ in'): ?>
             <a class="button" href="?page=order-detail&id=<?php echo (int) $ticket['order_id']; ?>"><?php echo $printWholeTable ? 'Quay lại' : 'Quay về order'; ?></a>
         <?php endif; ?>
     </div>
 </div>
+<?php if (!$printWholeTable && $ticket['status'] === 'Chờ in'): ?>
+    <span id="unsent-ticket-warning" hidden></span>
+    <script src="public/js/ticket-warning.js?v=<?php echo filemtime(__DIR__ . '/../../../public/js/ticket-warning.js'); ?>" defer></script>
+<?php endif; ?>

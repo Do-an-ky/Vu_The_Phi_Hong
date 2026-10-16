@@ -444,3 +444,174 @@
 .admin-dashboard .dashboard-orders-panel {
     scroll-margin-top: 20px;
 }
+
+/* Xem hóa đơn ngay bên phải bảng, chỉ mở khi bấm nút. */
+.admin-invoice-workspace {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 24px;
+    align-items: start;
+    min-width: 0;
+}
+.admin-invoice-workspace.has-preview {
+    grid-template-columns: minmax(0, 1fr) minmax(380px, 0.85fr);
+}
+.admin-invoice-workspace > .dashboard-orders-panel {
+    min-width: 0;
+}
+.admin-invoice-workspace .receipt-view-button {
+    white-space: nowrap;
+    color: #205a3a;
+    background: #eff6f1;
+    border: 1px solid #cdded2;
+}
+.admin-invoice-workspace .receipt-view-button[aria-current="true"] {
+    background: #205a3a;
+    color: #ffffff;
+}
+.admin-invoice-workspace .invoice-preview {
+    position: sticky;
+    top: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    height: min(850px, calc(100dvh - 40px));
+    min-width: 0;
+    padding: 20px;
+    border: 1px solid #d6e3da;
+    border-radius: 16px;
+    background: #ffffff;
+}
+.admin-invoice-workspace [hidden] {
+    display: none;
+}
+.admin-invoice-workspace .invoice-preview-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+.admin-invoice-workspace .invoice-preview-toolbar h2 {
+    margin: 0;
+    font-size: 20px;
+}
+.admin-invoice-workspace #invoice-preview-frame {
+    flex: 1;
+    min-height: 0;
+    width: 100%;
+    border: 1px solid #e1e8e3;
+    border-radius: 10px;
+}
+.admin-invoice-workspace #invoice-preview-status {
+    flex: 1;
+    color: #677c6c;
+}
+@media (max-width: 1100px) {
+    .admin-invoice-workspace.has-preview {
+        grid-template-columns: minmax(0, 1fr);
+    }
+    .admin-invoice-workspace .invoice-preview {
+        position: static;
+        height: 75dvh;
+        min-height: 420px;
+    }
+}
+/* Khi xem chi tiết, mỗi hóa đơn trở thành thẻ đủ thông tin và nút thao tác. */
+.admin-shell .admin-invoice-workspace.has-preview .table-scroll {
+    overflow: visible;
+    border: 0;
+    background: transparent;
+}
+.admin-shell .admin-invoice-workspace.has-preview .dashboard-orders-table,
+.admin-shell .admin-invoice-workspace.has-preview .dashboard-orders-table tbody {
+    display: block;
+    width: 100%;
+    min-width: 0;
+}
+.admin-shell .admin-invoice-workspace.has-preview .dashboard-orders-table thead {
+    display: none;
+}
+.admin-shell .admin-invoice-workspace.has-preview .dashboard-orders-table tr:not([hidden]) {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 10px 16px;
+    padding: 18px;
+    margin-bottom: 14px;
+    border: 1px solid #dce7df;
+    border-radius: 12px;
+    background: #ffffff;
+}
+.admin-shell .admin-invoice-workspace.has-preview .dashboard-orders-table td {
+    display: block;
+    width: auto;
+    min-width: 0;
+    padding: 0;
+    border: 0;
+    text-align: left;
+    white-space: normal;
+    overflow-wrap: break-word;
+    background: transparent;
+}
+.admin-shell .admin-invoice-workspace.has-preview td:nth-child(1) {
+    grid-column: 1;
+    grid-row: 1;
+    font-size: 18px;
+}
+.admin-shell .admin-invoice-workspace.has-preview td:nth-child(6) {
+    grid-column: 2;
+    grid-row: 1;
+    text-align: right;
+    white-space: nowrap;
+    font-size: 18px;
+    color: #205a3a;
+}
+.admin-shell .admin-invoice-workspace.has-preview td[data-label] {
+    grid-column: 1 / -1;
+    font-size: 13px;
+}
+.admin-shell .admin-invoice-workspace.has-preview td[data-label]::before {
+    content: attr(data-label) ": ";
+    color: #728177;
+}
+.admin-shell .admin-invoice-workspace.has-preview td:nth-child(5) {
+    grid-column: 1;
+    align-self: center;
+}
+.admin-shell .admin-invoice-workspace.has-preview td:nth-child(7) {
+    grid-column: 2;
+    text-align: right;
+}
+.admin-shell .admin-invoice-workspace.has-preview td[colspan] {
+    grid-column: 1 / -1;
+}
+.admin-shell .admin-invoice-workspace.has-preview .dashboard-section-heading {
+    flex-wrap: wrap;
+    gap: 12px;
+}
+/* Tách cột thao tác khỏi tổng tiền trong bảng hóa đơn. */
+.admin-shell .admin-invoice-workspace:not(.has-preview) .dashboard-orders-table th:last-child,
+.admin-shell .admin-invoice-workspace:not(.has-preview) .dashboard-orders-table td:last-child:not([colspan]) {
+    padding-left: 52px;
+    white-space: nowrap;
+}
+/* Căn thao tác về mép phải bảng hóa đơn. */
+.admin-shell .admin-invoice-workspace:not(.has-preview) .dashboard-orders-table th:last-child,
+.admin-shell .admin-invoice-workspace:not(.has-preview) .dashboard-orders-table td:last-child:not([colspan]) {
+    text-align: right;
+    padding-left: 24px;
+    padding-right: 18px;
+}
+/* Nhãn thao tác thẳng tâm với nút xem hóa đơn. */
+.admin-invoice-workspace .invoice-action-label,
+.admin-invoice-workspace .receipt-view-button {
+    width: 150px;
+    box-sizing: border-box;
+}
+.admin-invoice-workspace .invoice-action-label {
+    display: inline-block;
+    text-align: center;
+}
+.admin-invoice-workspace .receipt-view-button {
+    justify-content: center;
+    text-align: center;
+}

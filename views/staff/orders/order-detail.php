@@ -4,7 +4,10 @@ $order = $model->order($id);
 if (!$order) {
     throw new DomainException('Không tìm thấy order.');
 }
-$tickets = $model->tickets($id);
+// Theo dõi chỉ tính phiếu đã được nhân viên gửi xuống bếp.
+$tickets = array_values(array_filter($model->tickets($id), function ($ticket) {
+    return $ticket['status'] !== 'Chờ in';
+}));
 $items = $model->orderItems($id);
 ?>
 <div class="page-heading">
@@ -17,7 +20,11 @@ $items = $model->orderItems($id);
 </div>
 <section class="panel">
     <h2>Món đã gửi bếp</h2>
-    <?php require __DIR__ . '/items.php'; ?>
+    <?php if ($items): ?>
+        <?php require __DIR__ . '/items.php'; ?>
+    <?php else: ?>
+        <p class="empty">Bàn chưa gọi món.</p>
+    <?php endif; ?>
     <div class="ticket-total"><span>Tổng order</span><strong><?php echo tien($model->total($id)); ?></strong></div>
     <div class="actions">
         <?php if ($order['status'] === 'Đang phục vụ'): ?>
@@ -44,15 +51,10 @@ $items = $model->orderItems($id);
         <?php endif; ?>
     </div>
 </section>
+<?php if ($tickets): ?>
 <section class="panel section-title">
     <h2>Phiếu bếp – <?php echo e($order['table_name']); ?></h2>
-    <?php if (in_array($order['status'], array('Đang phục vụ', 'Chờ thanh toán'), true)): ?>
-        <?php foreach ($tickets as $pendingTicket): ?>
-            <?php if ($pendingTicket['status'] === 'Chờ in'): ?>
-                <p class="no-print"><a class="button" href="?page=orders&id=<?php echo $id; ?>&ticket_id=<?php echo (int) $pendingTicket['id']; ?>">Tiếp tục sửa phiếu chưa gửi</a></p>
-            <?php endif; ?>
-        <?php endforeach; ?>
-    <?php endif; ?>
+
     <?php if ($tickets): ?>
         <?php require __DIR__ . '/common-ticket-items.php'; ?>
         <div class="actions">
@@ -63,4 +65,4 @@ $items = $model->orderItems($id);
         <p class="empty">Bàn chưa có món đã xác nhận.</p>
     <?php endif; ?>
 </section>
-
+<?php endif; ?>

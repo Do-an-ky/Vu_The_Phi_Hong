@@ -59,34 +59,6 @@ if ((float) $stats['other'] !== 0.0) {
 
     <section class="dashboard-orders-panel">
         <div class="dashboard-section-heading">
-            <div><h2>Hóa đơn ngày <?php echo e($displayDate); ?></h2></div>
-            <span class="dashboard-order-count"><?php echo e($stats['invoices']); ?> hóa đơn</span>
-        </div>
-        <div class="table-scroll">
-            <table class="dashboard-orders-table">
-                <thead><tr><th>Hóa đơn</th><th>Order</th><th>Bàn</th><th>Người tạo đơn</th><th>Giờ tạo đơn</th><th>Thanh toán lúc</th><th>Phương thức</th><th class="money">Tổng tiền</th></tr></thead>
-                <tbody>
-                    <?php foreach ($stats['day_invoices'] as $order): ?>
-                        <tr>
-                            <td><strong class="order-code">#<?php echo e($order['id']); ?></strong></td>
-                            <td>#<?php echo e($order['order_id']); ?></td>
-                            <td><strong><?php echo e($order['table_name'] ?? '—'); ?></strong></td>
-                            <td><?php echo e($order['staff_name'] ?? '—'); ?></td>
-                            <td><?php echo e(date('H:i', strtotime($order['order_created_at']))); ?></td>
-                            <td><?php echo e(date('d/m H:i', strtotime($order['paid_at']))); ?></td>
-                            <td><span class="dashboard-status paid"><?php echo e($order['payment_method']); ?></span></td>
-                            <td class="money"><strong><?php echo tien($order['total']); ?></strong></td>
-                        </tr>
-                    <?php endforeach; ?>
-                    <?php if (!$stats['day_invoices']): ?>
-                        <tr><td colspan="8"><div class="dashboard-empty"><span>▤</span><strong>Chưa có hóa đơn</strong><p>Chưa có order của ngày này được thanh toán.</p></div></td></tr>
-                    <?php endif; ?>
-                </tbody>
-            </table>
-        </div>
-    </section>
-    <section class="dashboard-orders-panel">
-        <div class="dashboard-section-heading">
             <div>
                 <h2>Món đã bán ngày <?php echo e($displayDate); ?></h2>
             </div>
@@ -112,4 +84,45 @@ if ((float) $stats['other'] !== 0.0) {
             </table>
         </div>
     </section>
+    <div class="admin-invoice-workspace" id="payment-workspace">
+    <section class="dashboard-orders-panel">
+        <div class="dashboard-section-heading">
+            <div><h2>Hóa đơn ngày <?php echo e($displayDate); ?></h2></div>
+            <span class="dashboard-order-count"><?php echo e($stats['invoices']); ?> hóa đơn</span>
+        </div>
+        <div class="table-scroll">
+            <table class="dashboard-orders-table">
+                <thead><tr><th>Bàn</th><th>Người tạo đơn</th><th>Giờ tạo đơn</th><th>Thanh toán lúc</th><th>Phương thức</th><th class="money">Tổng tiền</th><th><span class="invoice-action-label">Thao tác</span></th></tr></thead>
+                <tbody>
+                    <?php foreach ($stats['day_invoices'] as $order): ?>
+                        <tr>
+                            
+                            
+                            <td><strong><?php echo e($order['table_name'] ?? '—'); ?></strong></td>
+                            <td data-label="Người tạo đơn"><?php echo e($order['staff_name'] ?? '—'); ?></td>
+                            <td data-label="Giờ tạo đơn"><?php echo e(date('H:i', strtotime($order['order_created_at']))); ?></td>
+                            <td data-label="Thanh toán lúc"><?php echo e(date('d/m H:i', strtotime($order['paid_at']))); ?></td>
+                            <td><span class="dashboard-status paid"><?php echo e($order['payment_method']); ?></span></td>
+                            <td class="money"><strong><?php echo tien($order['total']); ?></strong></td>
+                            <td><a class="button small receipt-view-button" href="staff.php?page=invoice&id=<?php echo (int) $order['id']; ?>">Xem hóa đơn</a></td>
+                        </tr>
+                    <?php endforeach; ?>
+                    <?php if (!$stats['day_invoices']): ?>
+                        <tr><td colspan="7"><div class="dashboard-empty"><span>▤</span><strong>Chưa có hóa đơn</strong><p>Chưa có order của ngày này được thanh toán.</p></div></td></tr>
+                    <?php endif; ?>
+                </tbody>
+            </table>
+        </div>
+    </section>
+        <aside class="invoice-preview" id="invoice-preview" aria-label="Chi tiết hóa đơn" hidden>
+            <div class="invoice-preview-toolbar">
+                <h2 id="invoice-preview-title">Hóa đơn</h2>
+                <button type="button" class="button" id="close-invoice-preview">Đóng</button>
+            </div>
+            <p id="invoice-preview-status" role="status">Chọn hóa đơn để xem chi tiết.</p>
+            <iframe id="invoice-preview-frame" title="Nội dung hóa đơn" hidden></iframe>
+            <button type="button" class="button primary" id="print-invoice-preview" disabled>In hóa đơn</button>
+        </aside>
+    </div>
+    <script src="public/js/payment-preview.js?v=<?php echo filemtime(__DIR__ . '/../../../public/js/payment-preview.js'); ?>" defer></script>
 </div>
